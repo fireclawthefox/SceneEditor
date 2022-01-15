@@ -1,0 +1,43 @@
+* TODO Base features
+  - [X] Adding models
+  - [X] Moving models
+  - [X] Rotating models
+  - [ ] Scaling models
+  - [X] Deleting models
+  - [ ] Add Empties
+  - [X] Show model origin
+  - [ ] Edit object properties
+    - Name
+  - [X] Undo/Redo (take kill cycle from DGui Editor)
+* TODO Edit Collision solids
+  - [ ] Add any kind of panda3d solids
+  - [ ] Edit solid properties
+    - collision masks
+    - Name
+* TODO Camera editing
+  - [ ] Add camera
+  - [ ] Edit camera properties
+    - Name
+    - Lense properties
+* TODO Scene lighting
+  - [ ] Add lamps
+  - [ ] Edit lamp properties
+    - name
+    - color
+    - type
+    - Optional lense properties
+    - Optional shadow caster props
+* TODO GUI
+  - [X] Scene graph browser (copy from DGui editor)
+  - [X] Menu bar
+  - [X] Tool bar
+  - [ ] Asset browser
+* TODO Exporting
+  - [X] Export all objects and settings as python class
+    - Make sure they can be directly used and don't do too much (similar to exported GUI python script)
+  - [X] Export as project JSON
+* TODO Extended features
+  - [ ] Nicer highlighting/outlining of selected models
+  - [ ] Texture editing
+  - [ ] adding shaders to objects
+  - [ ] Make objects placeable on other objects (taking normals) and optionally rotate to fit normals of hit objects
