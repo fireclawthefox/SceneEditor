@@ -162,6 +162,7 @@ class SceneEditor(ShowBase):
             "c": [self.core.toggle_collision_visualization],
             "g": [self.start_moving],
             "r": [self.start_rotating],
+            "s": [self.start_scaling],
             "delete": [self.core.remove],
             "h": [self.core.toggle_visibility],
 
@@ -280,6 +281,41 @@ class SceneEditor(ShowBase):
             self.core.stop_rotate_objects()
         else:
             self.core.cancel_rotate_objects()
+
+    def start_scaling(self):
+        self.ignore("mouse1")
+        self.ignore("shift-mouse1")
+        self.ignore("mouse3")
+
+        self.ignore_keyboard_events()
+
+        self.accept("mouse1", self.stop_scaling)
+        self.accept("mouse3", self.stop_scaling, [True])
+        self.accept("s", self.stop_scaling)
+        self.accept("x", self.core.limit_x)
+        self.accept("y", self.core.limit_y)
+        self.accept("z", self.core.limit_z)
+
+        self.core.start_scale_objects(self.core.selected_objects)
+
+    def stop_scaling(self, cancel=False):
+        self.ignore("mouse1")
+        self.ignore("mouse3")
+        self.ignore("s")
+        self.ignore("x")
+        self.ignore("y")
+        self.ignore("z")
+
+        self.accept("mouse1", self.core.handle_pick, [False])
+        self.accept("shift-mouse1", self.core.handle_pick, [True])
+        self.accept("mouse3", self.core.deselect_all)
+
+        self.register_keyboard_events()
+
+        if not cancel:
+            self.core.stop_scale_objects()
+        else:
+            self.core.cancel_scale_objects()
 
     def load_model_browser(self):
         self.browser = DirectFolderBrowser(
