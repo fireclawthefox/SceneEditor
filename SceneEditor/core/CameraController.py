@@ -33,7 +33,7 @@ class CameraController:
         # the camera
         self.camDistance = 75.0
         # min and maximal distance between player and camera
-        self.maxCamDistance = 500.0
+        self.maxCamDistance = 1000.0
         self.minCamDistance = 5.0
         # the speed at which the mousewheel and +/- will zoom the camera in/out
         self.zoomSpeed = 5.0
