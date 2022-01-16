@@ -50,7 +50,7 @@ class ToolBar(DirectObject):
             image="icons/New.png",
             image_scale=24)
         btn.setTransparency(TransparencyAttrib.M_multisample)
-        btn.bind(DGG.ENTER, self.tt.show, ["Create New GUI (Ctrl-N)"])
+        btn.bind(DGG.ENTER, self.tt.show, ["Create New Scene (Ctrl-N)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
 
@@ -63,7 +63,7 @@ class ToolBar(DirectObject):
             image="icons/Save.png",
             image_scale=24)
         btn.setTransparency(TransparencyAttrib.M_multisample)
-        btn.bind(DGG.ENTER, self.tt.show, ["Save GUI as gui Project (Ctrl-S)"])
+        btn.bind(DGG.ENTER, self.tt.show, ["Save Scene as Project (Ctrl-S)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
 
@@ -77,7 +77,7 @@ class ToolBar(DirectObject):
             image="icons/Export.png",
             image_scale=24)
         btn.setTransparency(TransparencyAttrib.M_multisample)
-        btn.bind(DGG.ENTER, self.tt.show, ["Export GUI as python script (Ctrl-E)"])
+        btn.bind(DGG.ENTER, self.tt.show, ["Export Scene as Python Script (Ctrl-E)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
 
@@ -91,7 +91,7 @@ class ToolBar(DirectObject):
             image="icons/Load.png",
             image_scale=24)
         btn.setTransparency(TransparencyAttrib.M_multisample)
-        btn.bind(DGG.ENTER, self.tt.show, ["Load GUI project (Ctrl-O)"])
+        btn.bind(DGG.ENTER, self.tt.show, ["Load Scene project (Ctrl-O)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
 
