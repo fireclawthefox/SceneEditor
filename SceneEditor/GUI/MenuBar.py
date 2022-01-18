@@ -65,7 +65,7 @@ class MenuBar(DirectObject):
         addEntries = [
             DirectMenuItemEntry("Model", base.messenger.send, ["loadModel"]),
             DirectMenuItemEntry("Empty", base.messenger.send, ["addEmpty"]),
-            DirectMenuItemSubMenu("Collision", [
+            DirectMenuItemSubMenu("Collision >", [
                 DirectMenuItemEntry("Sphere", base.messenger.send, ["addCollision", ["CollisionSphere"]]),
                 DirectMenuItemEntry("Box", base.messenger.send, ["addCollision", ["CollisionBox"]]),
                 DirectMenuItemEntry("Plane", base.messenger.send, ["addCollision", ["CollisionPlane"]]),
@@ -75,7 +75,7 @@ class MenuBar(DirectObject):
                 DirectMenuItemEntry("Ray", base.messenger.send, ["addCollision", ["CollisionRay"]]),
                 #DirectMenuItemEntry("Parabola", base.messenger.send, ["addCollision", ["CollisionParabola"]]),
                 DirectMenuItemEntry("Inverse Sphere", base.messenger.send, ["addCollision", ["CollisionInvSphere"]]),
-                #Polygon # Do we want to support this?
+                #Polygon    # Do we want to support this
                 ])
         ]
         #TODO: THE COLORS DON'T WORK CORRECT YET
