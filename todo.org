@@ -8,12 +8,17 @@
   - [X] Show model origin
   - [ ] Edit object properties
     - Name
+    - Transformation
   - [X] Undo/Redo (take kill cycle from DGui Editor)
-* TODO Edit Collision solids [0%]
-  - [ ] Add any kind of panda3d solids
+* TODO Edit Collision solids [20%]
+  - [X] Add any kind of panda3d solids
   - [ ] Edit solid properties
     - collision masks
     - Name
+  - [ ] Save solids
+    - Can we get solid details from the col_np.node()?
+  - [ ] Load solids
+  - [ ] Export solids
 * TODO Camera editing [0%]
   - [ ] Add camera
   - [ ] Edit camera properties
@@ -27,17 +32,21 @@
     - type
     - Optional lense properties
     - Optional shadow caster props
-* TODO GUI [75%]
+* TODO GUI [50%]
   - [X] Scene graph browser (copy from DGui editor)
   - [X] Menu bar
   - [X] Tool bar
+  - [ ] Help Dialog
+  - [ ] Configuration Dialog
   - [ ] Asset browser
 * DONE Exporting [100%]
   - [X] Export all objects and settings as python class
     - Make sure they can be directly used and don't do too much (similar to exported GUI python script)
   - [X] Export as project JSON
-* TODO Extended features [0%]
+* TODO Extended features [16%]
   - [ ] Nicer highlighting/outlining of selected models
   - [ ] Texture editing
   - [ ] adding shaders to objects
   - [ ] Make objects placeable on other objects (taking normals) and optionally rotate to fit normals of hit objects
+  - [ ] Edit Render attributes of objects (e.g. bilboard, compass, etc...)
+  - [X] Make sure the 3D space is not occupied by other panels e.g. it scales and is centered between other panels
