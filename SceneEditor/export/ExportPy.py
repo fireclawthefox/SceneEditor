@@ -50,13 +50,22 @@ class ExporterPy:
         if hasattr(root, "get_children"):
             for obj in root.get_children():
                 if obj in self.objects and not obj.is_stashed():
-                    obj_name = obj.get_name().replace(".", "_")
-                    model_path = f"\"{obj.get_tag('filepath')}\""
-                    self.content += " "*8 + f"{obj_name} = loader.load_model({model_path})\n"
-                    self.content += " "*8 + f"{obj_name}.set_pos({obj.get_pos()})\n"
-                    self.content += " "*8 + f"{obj_name}.set_hpr({obj.get_hpr()})\n"
-                    self.content += " "*8 + f"{obj_name}.set_scale({obj.get_scale()})\n"
-                    self.content += " "*8 + f"{obj_name}.reparent_to({root_name})\n\n"
+                    if obj.get_tag("object_type") == "model":
+                        obj_name = obj.get_name().replace(".", "_")
+                        model_path = f"\"{obj.get_tag('filepath')}\""
+                        self.content += " "*8 + f"{obj_name} = loader.load_model({model_path})\n"
+                        self.content += " "*8 + f"{obj_name}.set_pos({obj.get_pos()})\n"
+                        self.content += " "*8 + f"{obj_name}.set_hpr({obj.get_hpr()})\n"
+                        self.content += " "*8 + f"{obj_name}.set_scale({obj.get_scale()})\n"
+                        self.content += " "*8 + f"{obj_name}.reparent_to({root_name})\n\n"
+
+                    elif obj.get_tag("object_type") == "collision":
+                        self.content += " "*8 + f"col = {obj.get_tag('collision_solid_type')}(\n"
+                        self.content += " "*12 + f"#TODO\n"
+                        self.content += " "*8 + f")\n"
+                        self.content += " "*8 + f"cn = CollisionNode(\"{obj.get_name()}\")\n"
+                        self.content += " "*8 + f"cn.addSolid(col)\n"
+                        self.content += " "*8 + f"col_np = {root_name}.attachNewNode(cn)\n\n"
 
                 self.write_scene_element(obj, obj.get_name())
 

@@ -142,7 +142,7 @@ class StructurePanel():
 
     def __make_structure_frame_tree_item(self, obj, parents_level, z):
         parent_shift = 10
-        if not obj.has_tag("model_id"):
+        if not obj.has_tag("scene_object_id"):
             lbl = DirectLabel(
                 text=obj.getName(),
                 text_align=TextNode.ALeft,

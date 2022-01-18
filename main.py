@@ -74,6 +74,9 @@ class SceneEditor(ShowBase):
 
         self.enable_events()
 
+        base.taskMgr.step()
+        base.taskMgr.do_method_later(0, self.mainView.update_3d_display_region, "delayed_display_region_update", extraArgs=[])
+
     def enable_events(self):
         self.accept("escape", self.inteligentEscape)
 
@@ -129,6 +132,7 @@ class SceneEditor(ShowBase):
         self.accept("pasteElement", self.core.paste_elements)
         #self.accept("showSettings"
         #self.accept("showHelp"
+        self.accept("addCollision", self.core.add_collision_solid)
 
         self.accept("update_structure", self.update_structure_panel)
 
@@ -138,6 +142,7 @@ class SceneEditor(ShowBase):
         self.accept("selectElement", self.core.select)
         self.accept("moveElementInStructure", self.core.move_element_in_structure)
 
+        self.accept("3d_display_region_changed", self.core.update_selection_mouse_watcher)
         self.register_keyboard_events()
 
     def register_keyboard_events(self):
@@ -146,6 +151,7 @@ class SceneEditor(ShowBase):
             "control-s": [self.save],
             "control-e": [self.export],
             "control-o": [self.load],
+            "control-g": [self.mainView.tool_bar.cb_grid.commandFunc, [None]],
             "control-q": [self.quit_app],
 
             "+": [self.camcontroller.zoom, [True]],

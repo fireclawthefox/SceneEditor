@@ -7,6 +7,22 @@ from SceneEditor.core.KillRing import KillRing
 from SceneEditor.core.TransformationHandler import TransformationHandler
 from SceneEditor.core.SelectionHandler import SelectionHandler
 
+from panda3d.core import (
+    Plane,
+    Vec3,
+    Point3,
+    CollisionNode,
+    CollisionSphere,
+    CollisionCapsule,
+    CollisionInvSphere,
+    CollisionPlane,
+    CollisionRay,
+    CollisionLine,
+    CollisionSegment,
+    CollisionParabola,
+    CollisionBox,
+    )
+
 class Core(TransformationHandler, SelectionHandler):
     def __init__(self):
         self.killRing = KillRing()
@@ -59,9 +75,13 @@ class Core(TransformationHandler, SelectionHandler):
 
         # load the axis that should be displayed
         self.axis = loader.loadModel("zup-axis")
+        self.axis2 = loader.loadModel("misc/xyzAxis")
+        self.axis2.set_h(180)
+        self.axis2.set_sz(-1)
+        self.axis2.reparent_to(self.axis)
         # make sure it will be drawn above all other elements
         self.axis.set_scale(0.02)
-        self.axis.reparentTo(aspect2d)
+        self.axis.reparent_to(aspect2d)
 
         ws = base.win.get_size()
 
@@ -89,10 +109,48 @@ class Core(TransformationHandler, SelectionHandler):
         model = loader.loadModel(path)
         model.set_tag("filepath", path)
         model.set_tag("object_type", "model")
-        model.set_tag("model_id", str(uuid4()))
+        model.set_tag("scene_object_id", str(uuid4()))
         model.reparent_to(self.scene_model_parent)
         self.models.append(model)
         return model
+
+    def add_collision_solid(self, solid_type):
+        if solid_type == "CollisionSphere":
+            col = CollisionSphere(0,0,0,1)
+        elif solid_type == "CollisionBox":
+            col = CollisionBox(Point3(0, 0, 0), 1, 1, 1)
+        elif solid_type == "CollisionPlane":
+            col = CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0)))
+        elif solid_type == "CollisionCapsule":
+            col = CollisionCapsule(0, 0, 0, 0, 0, 1, 0.3)
+        elif solid_type == "CollisionLine":
+            col = CollisionLine(0, 0, 0, 0, 0, 1)
+        elif solid_type == "CollisionSegment":
+            col = CollisionSegment(0, 0, 0, 0, 0, 1)
+        elif solid_type == "CollisionRay":
+            col = CollisionRay(0, 0, 0, 0, 0, 1)
+        #elif solid_type == "Parabola":
+        elif solid_type == "CollisionInvSphere":
+            col = CollisionInvSphere(0, 0, 0, 1)
+        else:
+            logging.warning(f"Unsupported collision solid type {solid_type}.")
+            return
+
+        cn = CollisionNode("collision_node")
+        cn.addSolid(col)
+        col_np = self.scene_model_parent.attachNewNode(cn)
+        col_np.show()
+        col_np.set_tag("object_type", "collision")
+        col_np.set_tag("collision_solid_type", solid_type)
+        col_np.set_tag("scene_object_id", str(uuid4()))
+
+        #TODO: HOW DO WE ADD THE COL SOLID INITIALISATION STUFF HERE (ORIGIN, RADIUS, SIZE, ETC)?
+        #THIS ALSO NEEDS TO BE DONE FOR EXPORTING AND SAVING
+        #LOADING IS COMPLETELY MISSING YET
+
+        self.models.append(col_np)
+
+        base.messenger.send("update_structure")
 
     def move_element_in_structure(self, direction=1, objects=None):
         print(direction)
@@ -160,7 +218,7 @@ class Core(TransformationHandler, SelectionHandler):
 
             for obj in self.copied_objects:
                 new_obj = obj.copy_to(parent)
-                new_obj.set_tag("model_id", str(uuid4()))
+                new_obj.set_tag("scene_object_id", str(uuid4()))
                 self.models.append(new_obj)
                 self.select(new_obj, True)
 

@@ -63,8 +63,22 @@ class MenuBar(DirectObject):
         self.tools = self.__create_menu_item("Tools", toolsEntries)
 
         addEntries = [
-            DirectMenuItemEntry("model", base.messenger.send, ["loadModel"]),
+            DirectMenuItemEntry("Model", base.messenger.send, ["loadModel"]),
+            DirectMenuItemEntry("Empty", base.messenger.send, ["addEmpty"]),
+            DirectMenuItemSubMenu("Collision", [
+                DirectMenuItemEntry("Sphere", base.messenger.send, ["addCollision", ["CollisionSphere"]]),
+                DirectMenuItemEntry("Box", base.messenger.send, ["addCollision", ["CollisionBox"]]),
+                DirectMenuItemEntry("Plane", base.messenger.send, ["addCollision", ["CollisionPlane"]]),
+                DirectMenuItemEntry("Capsule", base.messenger.send, ["addCollision", ["CollisionCapsule"]]),
+                DirectMenuItemEntry("Line", base.messenger.send, ["addCollision", ["CollisionLine"]]),
+                DirectMenuItemEntry("Segment", base.messenger.send, ["addCollision", ["CollisionSegment"]]),
+                DirectMenuItemEntry("Ray", base.messenger.send, ["addCollision", ["CollisionRay"]]),
+                #DirectMenuItemEntry("Parabola", base.messenger.send, ["addCollision", ["CollisionParabola"]]),
+                DirectMenuItemEntry("Inverse Sphere", base.messenger.send, ["addCollision", ["CollisionInvSphere"]]),
+                #Polygon # Do we want to support this?
+                ])
         ]
+        #TODO: THE COLORS DON'T WORK CORRECT YET
         self.add = self.__create_menu_item("Add", addEntries)
 
         self.menuBar.addItem(self.file, skipRefresh=True)

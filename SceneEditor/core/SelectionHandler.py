@@ -1,27 +1,33 @@
 from panda3d.core import (
+    MouseWatcher,
     CollisionTraverser,
     CollisionHandlerQueue,
     CollisionRay,
     CollisionNode,
     GeomNode,
-    Point3)
+    Point3,
+    BitMask32)
 
 class SelectionHandler:
     def __init__(self):
+        # new mouse watcher to handle display region changes correct
+        self.selction_mouse_watcher = MouseWatcher()
+        base.mouseWatcher.getParent().attachNewNode(self.selction_mouse_watcher)
+
         self.pick_traverser = CollisionTraverser()
 
         self.picker_ray = CollisionRay()
         self.pick_handler = CollisionHandlerQueue()
 
         self.picker_node = CollisionNode("mouseRay")
-        self.picker_node.setFromCollideMask(GeomNode.getDefaultCollideMask())
+        self.picker_node.setFromCollideMask(BitMask32.all_on()) #GeomNode.getDefaultCollideMask())
         self.picker_node.addSolid(self.picker_ray)
 
         self.picker_np = base.cam.attachNewNode(self.picker_node)
 
         self.pick_traverser.addCollider(self.picker_np, self.pick_handler)
 
-        self.selection_highlight_marker = loader.loadModel('models/misc/sphere')
+        self.selection_highlight_marker = loader.load_model('models/misc/sphere')
         self.selection_highlight_marker.node().setName('selection_highlight_marker')
         self.selection_highlight_marker.reparentTo(self.scene_root)
         self.selection_highlight_marker.setColor(1, 0.6, 0.2, 1)
@@ -31,18 +37,21 @@ class SelectionHandler:
         self.selection_highlight_marker.setScale(0.3)
         self.selection_highlight_marker.hide()
 
+    def update_selection_mouse_watcher(self):
+        dr = base.cam.node().get_display_region(0)
+        self.selction_mouse_watcher.setDisplayRegion(dr)
 
     def handle_pick(self, multiselect):
-        if base.mouseWatcherNode.hasMouse():
-            mpos = base.mouseWatcherNode.getMouse()
+        if self.selction_mouse_watcher.hasMouse():
+            mpos = self.selction_mouse_watcher.getMouse()
             self.picker_ray.setFromLens(base.camNode, mpos.x, mpos.y)
             self.pick_traverser.traverse(self.scene_model_parent)
 
             if self.pick_handler.getNumEntries() > 0:
                 self.pick_handler.sortEntries()
                 picked_obj = self.pick_handler.getEntry(0).getIntoNodePath()
-                picked_obj = picked_obj.findNetTag("model_id")
-                if not picked_obj.isEmpty():
+                picked_obj = picked_obj.findNetTag("scene_object_id")
+                if not picked_obj.is_empty() and not picked_obj.is_hidden():
                     base.messenger.send("pickObject", [picked_obj, multiselect])
 
     def select(self, obj, multiselect=False):
@@ -113,10 +122,10 @@ class SelectionHandler:
             objs = self.selected_objects
 
         for obj in objs:
-            if obj.is_stashed():
-                obj.unstash()
+            if obj.is_hidden():
+                obj.show()
             else:
-                obj.stash()
+                obj.hide()
                 #self.deselect(obj)
 
         base.messenger.send("update_structure")
