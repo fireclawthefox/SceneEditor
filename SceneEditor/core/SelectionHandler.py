@@ -79,6 +79,7 @@ class SelectionHandler:
         self.selection_highlight_marker.show()
 
         base.messenger.send("update_structure")
+        base.messenger.send("update_properties")
 
     def deselect(self, obj):
         if obj not in self.selected_objects: return
@@ -88,6 +89,7 @@ class SelectionHandler:
             self.selection_highlight_marker.hide()
 
         base.messenger.send("update_structure")
+        base.messenger.send("update_properties")
 
     def deselect_all(self):
         for obj in self.selected_objects:
@@ -97,6 +99,7 @@ class SelectionHandler:
         self.selected_objects = []
 
         base.messenger.send("update_structure")
+        base.messenger.send("update_properties")
 
     def remove(self, objs=None, includeWithKillCycle=True):
         if objs is None:

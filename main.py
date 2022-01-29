@@ -127,6 +127,7 @@ class SceneEditor(ShowBase):
         self.accept("addLight", self.core.add_light)
 
         self.accept("update_structure", self.update_structure_panel)
+        base.accept("update_properties", self.update_properties_panel)
 
         # UI ELEMENT EDITING
         self.accept("toggleElementVisibility", self.core.toggle_visibility)
@@ -135,6 +136,9 @@ class SceneEditor(ShowBase):
         self.accept("moveElementInStructure", self.core.move_element_in_structure)
 
         self.accept("3d_display_region_changed", self.core.update_selection_mouse_watcher)
+
+        self.accept("unregisterKeyboardEvents", self.ignore_keyboard_events)
+        self.accept("reregisterKeyboardEvents", self.register_keyboard_events)
         self.register_keyboard_events()
 
     def register_keyboard_events(self):
@@ -332,6 +336,10 @@ class SceneEditor(ShowBase):
 
     def update_structure_panel(self):
         self.mainView.structurePanel.refreshStructureTree(self.core.scene_objects, self.core.selected_objects)
+
+    def update_properties_panel(self):
+        self.mainView.propertiesPanel.clear()
+        self.mainView.propertiesPanel.setupProperties(self.core.selected_objects)
 
     def disableEvents(self):
         self.ignoreAll()

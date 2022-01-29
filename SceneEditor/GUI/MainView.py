@@ -14,6 +14,7 @@ from DirectGuiExtension.DirectSplitFrame import DirectSplitFrame
 
 from SceneEditor.GUI.MenuBar import MenuBar
 from SceneEditor.GUI.ToolBar import ToolBar
+from SceneEditor.GUI.panels.PropertiesPanel import PropertiesPanel
 from SceneEditor.GUI.panels.StructurePanel import StructurePanel
 
 
@@ -61,11 +62,8 @@ class MainView(DirectObject):
         # the splitter separating the the panels from the main content area
         self.mainSplitter = DirectSplitFrame(
             frameSize=self.get_main_splitter_size(),
-            #firstFrameMinSize=0,
-            #secondFrameMinSize=100,
             splitterWidth=splitterWidth,
-            splitterPos=-base.getSize()[0]/4,
-            pixel2d=False)
+            splitterPos=-base.getSize()[0]/4)
         self.mainSplitter["frameColor"] = (0,0,0,0)
         self.mainSplitter.secondFrame["frameColor"] = (0,0,0,0)
 
@@ -77,6 +75,23 @@ class MainView(DirectObject):
             child=self.mainSplitter,
             parentGetSizeFunction=self.get_main_splitter_size,
             childUpdateSizeFunc=self.mainSplitter.refresh,
+            )
+
+        # The splitter dividing the sidebar on the left
+        self.sidebarSplitter = DirectSplitFrame(
+            orientation=DGG.VERTICAL,
+            frameSize=self.mainSplitter.firstFrame["frameSize"],
+            splitterWidth=splitterWidth,
+            splitterPos=DGH.getRealHeight(self.mainSplitter.firstFrame) / 2,
+            pixel2d=True)
+
+        # The sizer which makes sure our sidebar is filling up
+        self.sidebarSplitSizer = DirectAutoSizer(
+            updateOnWindowResize=False,
+            frameColor=(0,0,0,0),
+            parent=self.mainSplitter.firstFrame,
+            child=self.sidebarSplitter,
+            childUpdateSizeFunc=self.sidebarSplitter.refresh,
             )
 
         # CONNECT THE UI ELEMENTS
@@ -104,8 +119,12 @@ class MainView(DirectObject):
         self.toolBarSizer.setChild(self.tool_bar.toolBar)
         self.toolBarSizer["childUpdateSizeFunc"] = self.tool_bar.toolBar.refresh
 
-        self.structurePanel = StructurePanel(self.mainSplitter.firstFrame)
-        self.mainSplitter["firstFrameUpdateSizeFunc"] = self.structurePanel.resizeFrame
+        self.propertiesPanel = PropertiesPanel(self.sidebarSplitter.firstFrame, tooltip)
+        self.structurePanel = StructurePanel(self.sidebarSplitter.secondFrame)
+        self.sidebarSplitter["firstFrameUpdateSizeFunc"] = self.propertiesPanel.resizeFrame
+        self.sidebarSplitter["secondFrameUpdateSizeFunc"] = self.structurePanel.resizeFrame
+
+        self.mainSplitter["firstFrameUpdateSizeFunc"] = self.sidebarSplitSizer.refresh
         self.mainSplitter["secondFrameUpdateSizeFunc"] = self.update_3d_display_region
 
 

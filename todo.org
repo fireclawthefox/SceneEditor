@@ -1,4 +1,4 @@
-* TODO Base features [88%]
+* DONE Base features [100%]
   - [X] Adding models
   - [X] Moving models
   - [X] Rotating models
@@ -6,7 +6,7 @@
   - [X] Deleting models
   - [X] Add Empties
   - [X] Show model origin
-  - [ ] Edit object properties
+  - [X] Edit object properties
     - Name
     - Transformation
   - [X] Undo/Redo (take kill cycle from DGui Editor)

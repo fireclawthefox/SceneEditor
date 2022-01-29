@@ -160,6 +160,7 @@ class TransformationHandler:
             for obj in t.object_infos.keys():
                 base.messenger.send("addToKillRing",
                     [obj, "set", "pos", t.object_infos[obj], obj.get_pos()])
+            base.messenger.send("update_properties")
 
         self.clear_limit()
 
@@ -284,6 +285,7 @@ class TransformationHandler:
             for obj in t.object_infos.keys():
                 base.messenger.send("addToKillRing",
                     [obj, "set", "hpr", t.object_infos[obj][2], obj.get_hpr()])
+            base.messenger.send("update_properties")
 
         self.clear_limit()
 
@@ -396,6 +398,7 @@ class TransformationHandler:
             for obj in t.object_infos.keys():
                 base.messenger.send("addToKillRing",
                     [obj, "set", "scale", t.object_infos[obj][0], obj.get_scale()])
+            base.messenger.send("update_properties")
 
         self.clear_limit()
 
