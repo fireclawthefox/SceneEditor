@@ -93,7 +93,6 @@ class MainView(DirectObject):
             updateFunc=self.mainSplitSizer.refresh,
             skipRefresh=True)
 
-
         #
         # CONTENT SETUP
         #
@@ -111,8 +110,6 @@ class MainView(DirectObject):
 
 
         self.mainBox.refresh()
-
-        self.accept('window-event', self.window_event_handler)
 
     def update_3d_display_region(self):
         dr = base.cam.node().get_display_region(0)
@@ -132,13 +129,6 @@ class MainView(DirectObject):
         base.camLens.setAspectRatio(w/h)
 
         base.messenger.send("3d_display_region_changed")
-
-    def window_event_handler(self, window=None):
-        if window != base.win:
-            # This event isn't about our window.
-            return
-
-        #self.mainBox.refresh()
 
     def get_main_splitter_size(self):
         return (
