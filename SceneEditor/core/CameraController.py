@@ -31,12 +31,12 @@ class CameraController:
         base.disableMouse()
         # this variable will be used to determine the distance from the player to
         # the camera
-        self.camDistance = 75.0
+        self.camDistance = 15.0
         # min and maximal distance between player and camera
         self.maxCamDistance = 1000.0
-        self.minCamDistance = 5.0
+        self.minCamDistance = 3.0
         # the speed at which the mousewheel and +/- will zoom the camera in/out
-        self.zoomSpeed = 5.0
+        self.zoomSpeed = 1.0
         # the speed at which the mouse moves the camera
         self.mouseSpeed = 50
 
@@ -51,15 +51,18 @@ class CameraController:
     def toggle_lense(self):
         if self.is_orthographic:
             lens = PerspectiveLens()
+            # TODO: get the size according to the display region size
             lens.set_film_size(*base.win.get_size())
             lens.set_fov(self.fov)
-            lens.set_near_far(0.1, 1000)
+            lens.set_near_far(0.001, 1000)
         else:
             lens = OrthographicLens()
+            # TODO: get the aspect according to the display region size
             aspect = base.win.get_size()[0] / base.win.get_size()[1]
             lens.setFilmSize(self.ortho_zoom_size*aspect, self.ortho_zoom_size)
             lens.set_near_far(0.001, 1000)
         base.cam.node().set_lens(lens)
+        base.camLens = lens
         self.is_orthographic = not self.is_orthographic
 
     def setPivot(self, h, p):

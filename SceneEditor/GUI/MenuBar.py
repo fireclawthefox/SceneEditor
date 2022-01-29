@@ -64,18 +64,25 @@ class MenuBar(DirectObject):
 
         addEntries = [
             DirectMenuItemEntry("Model", base.messenger.send, ["loadModel"]),
+            DirectMenuItemEntry("Panda", base.messenger.send, ["loadPanda"]),
             DirectMenuItemEntry("Empty", base.messenger.send, ["addEmpty"]),
             DirectMenuItemSubMenu("Collision >", [
-                DirectMenuItemEntry("Sphere", base.messenger.send, ["addCollision", ["CollisionSphere"]]),
-                DirectMenuItemEntry("Box", base.messenger.send, ["addCollision", ["CollisionBox"]]),
-                DirectMenuItemEntry("Plane", base.messenger.send, ["addCollision", ["CollisionPlane"]]),
-                DirectMenuItemEntry("Capsule", base.messenger.send, ["addCollision", ["CollisionCapsule"]]),
-                DirectMenuItemEntry("Line", base.messenger.send, ["addCollision", ["CollisionLine"]]),
-                DirectMenuItemEntry("Segment", base.messenger.send, ["addCollision", ["CollisionSegment"]]),
-                DirectMenuItemEntry("Ray", base.messenger.send, ["addCollision", ["CollisionRay"]]),
-                #DirectMenuItemEntry("Parabola", base.messenger.send, ["addCollision", ["CollisionParabola"]]),
-                DirectMenuItemEntry("Inverse Sphere", base.messenger.send, ["addCollision", ["CollisionInvSphere"]]),
+                DirectMenuItemEntry("Sphere", base.messenger.send, ["addCollision", ["CollisionSphere", {}]]),
+                DirectMenuItemEntry("Box", base.messenger.send, ["addCollision", ["CollisionBox", {}]]),
+                DirectMenuItemEntry("Plane", base.messenger.send, ["addCollision", ["CollisionPlane", {}]]),
+                DirectMenuItemEntry("Capsule", base.messenger.send, ["addCollision", ["CollisionCapsule", {}]]),
+                DirectMenuItemEntry("Line", base.messenger.send, ["addCollision", ["CollisionLine", {}]]),
+                DirectMenuItemEntry("Segment", base.messenger.send, ["addCollision", ["CollisionSegment", {}]]),
+                DirectMenuItemEntry("Ray", base.messenger.send, ["addCollision", ["CollisionRay", {}]]),
+                #DirectMenuItemEntry("Parabola", base.messenger.send, ["addCollision", ["CollisionParabola", {}]]),
+                DirectMenuItemEntry("Inverse Sphere", base.messenger.send, ["addCollision", ["CollisionInvSphere", {}]]),
                 #Polygon    # Do we want to support this
+                ]),
+            DirectMenuItemSubMenu("Light >", [
+                DirectMenuItemEntry("Point Light", base.messenger.send, ["addLight", ["PointLight", {}]]),
+                DirectMenuItemEntry("Spotlight", base.messenger.send, ["addLight", ["Spotlight", {}]]),
+                DirectMenuItemEntry("Directional Light", base.messenger.send, ["addLight", ["DirectionalLight", {}]]),
+                DirectMenuItemEntry("Ambient Light", base.messenger.send, ["addLight", ["AmbientLight", {}]]),
                 ])
         ]
         #TODO: THE COLORS DON'T WORK CORRECT YET

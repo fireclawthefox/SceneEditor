@@ -56,17 +56,6 @@ class SceneEditor(ShowBase):
 
         base.cTrav = CollisionTraverser("base traverser")
 
-        panda = self.core.load_model("models/panda")
-
-        panda = self.core.load_model("models/panda")
-        panda.setY(30)
-        panda.setZ(-5)
-
-        panda = self.core.load_model("models/panda")
-        panda.setX(30)
-        panda.setY(15)
-        panda.setZ(5)
-
         self.mainView.structurePanel.refreshStructureTree(self.core.models, self.core.selected_objects)
 
         self.dlg_quit = None
@@ -117,6 +106,7 @@ class SceneEditor(ShowBase):
         self.accept("saveProject", self.save)
         self.accept("exportProject", self.export)
         self.accept("loadModel", self.load_model_browser)
+        self.accept("loadPanda", self.core.load_model, ["models/panda"])
         self.accept("quit_app", self.quit_app)
         self.accept("toggleGrid", self.core.toggle_grid)
         self.accept("zoom-in", self.camcontroller.zoom, [True])
@@ -132,7 +122,9 @@ class SceneEditor(ShowBase):
         self.accept("pasteElement", self.core.paste_elements)
         #self.accept("showSettings"
         #self.accept("showHelp"
+        self.accept("addEmpty", self.core.add_empty)
         self.accept("addCollision", self.core.add_collision_solid)
+        self.accept("addLight", self.core.add_light)
 
         self.accept("update_structure", self.update_structure_panel)
 
@@ -176,7 +168,6 @@ class SceneEditor(ShowBase):
             "control-x": [self.core.cut_elements],
             "control-v": [self.core.paste_elements],
 
-            #"control-g": [self.toolBar.cb_grid.commandFunc, [None]],
             #"f1": [self.showHelp],
             "control-z": [self.core.undo],
             "control-y": [self.core.redo],
@@ -219,6 +210,7 @@ class SceneEditor(ShowBase):
 
 
     def start_moving(self):
+        if not self.core.has_objects_selected(): return
         self.ignore("mouse1")
         self.ignore("shift-mouse1")
         self.ignore("mouse3")
@@ -254,6 +246,7 @@ class SceneEditor(ShowBase):
             self.core.cancel_move_objects()
 
     def start_rotating(self):
+        if not self.core.has_objects_selected(): return
         self.ignore("mouse1")
         self.ignore("shift-mouse1")
         self.ignore("mouse3")
@@ -289,6 +282,7 @@ class SceneEditor(ShowBase):
             self.core.cancel_rotate_objects()
 
     def start_scaling(self):
+        if not self.core.has_objects_selected(): return
         self.ignore("mouse1")
         self.ignore("shift-mouse1")
         self.ignore("mouse3")
@@ -333,7 +327,6 @@ class SceneEditor(ShowBase):
     def load_model_browser_action(self, confirm):
         if confirm:
             self.core.load_model(self.browser.get())
-            base.messenger.send("update_structure")
         self.browser.hide()
         self.browser = None
 

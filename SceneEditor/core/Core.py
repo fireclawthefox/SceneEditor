@@ -11,6 +11,9 @@ from panda3d.core import (
     Plane,
     Vec3,
     Point3,
+    NodePath,
+
+    # Collision solids
     CollisionNode,
     CollisionSphere,
     CollisionCapsule,
@@ -21,6 +24,15 @@ from panda3d.core import (
     CollisionSegment,
     CollisionParabola,
     CollisionBox,
+
+    # Lights
+    PointLight,
+    DirectionalLight,
+    AmbientLight,
+    Spotlight,
+
+    # Lens
+    PerspectiveLens
     )
 
 class Core(TransformationHandler, SelectionHandler):
@@ -59,6 +71,8 @@ class Core(TransformationHandler, SelectionHandler):
         for obj in self.models[:]:
             self.deselect(obj)
             obj.remove_node()
+
+        self.scene_model_parent.clearLight()
 
         self.models = []
         self.limit_line.reset()
@@ -112,37 +126,94 @@ class Core(TransformationHandler, SelectionHandler):
         model.set_tag("scene_object_id", str(uuid4()))
         model.reparent_to(self.scene_model_parent)
         self.models.append(model)
+
+        base.messenger.send("update_structure")
         return model
 
-    def add_collision_solid(self, solid_type):
-        if solid_type == "CollisionSphere":
-            col = CollisionSphere(0,0,0,1)
-        elif solid_type == "CollisionBox":
-            col = CollisionBox(Point3(0, 0, 0), 1, 1, 1)
-        elif solid_type == "CollisionPlane":
-            col = CollisionPlane(Plane(Vec3(0, 0, 1), Point3(0, 0, 0)))
-        elif solid_type == "CollisionCapsule":
-            col = CollisionCapsule(0, 0, 0, 0, 0, 1, 0.3)
-        elif solid_type == "CollisionLine":
-            col = CollisionLine(0, 0, 0, 0, 0, 1)
-        elif solid_type == "CollisionSegment":
-            col = CollisionSegment(0, 0, 0, 0, 0, 1)
-        elif solid_type == "CollisionRay":
-            col = CollisionRay(0, 0, 0, 0, 0, 1)
-        #elif solid_type == "Parabola":
-        elif solid_type == "CollisionInvSphere":
-            col = CollisionInvSphere(0, 0, 0, 1)
-        else:
-            logging.warning(f"Unsupported collision solid type {solid_type}.")
-            return
+    def add_empty(self):
+        model = loader.loadModel("models/misc/xyzAxis")
+        model.set_tag("object_type", "empty")
+        model.set_tag("scene_object_id", str(uuid4()))
+        model.reparent_to(self.scene_model_parent)
+        self.models.append(model)
 
+        base.messenger.send("update_structure")
+        return model
+
+    def add_collision_solid(self, solid_type, solid_info):
         cn = CollisionNode("collision_node")
-        cn.addSolid(col)
         col_np = self.scene_model_parent.attachNewNode(cn)
         col_np.show()
         col_np.set_tag("object_type", "collision")
         col_np.set_tag("collision_solid_type", solid_type)
         col_np.set_tag("scene_object_id", str(uuid4()))
+
+
+        if solid_type == "CollisionSphere":
+            if solid_info == {}:
+                solid_info["center"] = Point3(0, 0, 0)
+                solid_info["radius"] = 1
+            center = solid_info["center"]
+            radius = solid_info["radius"]
+            col = CollisionSphere(center,radius)
+        elif solid_type == "CollisionBox":
+            if solid_info == {}:
+                solid_info["center"] = Point3(0, 0, 0)
+                solid_info["dimensions"] = Point3(1, 1, 1)
+            center = solid_info["center"]
+            dimensions = solid_info["dimensions"]
+            col = CollisionBox(center, dimensions.x, dimensions.y, dimensions.z)
+        elif solid_type == "CollisionPlane":
+            if solid_info == {}:
+                solid_info["normal"] = Vec3(0, 0, 1)
+                solid_info["position"] = Point3(0, 0, 0)
+            normal = solid_info["normal"]
+            position = solid_info["position"]
+            col = CollisionPlane(Plane(normal, position))
+        elif solid_type == "CollisionCapsule":
+            if solid_info == {}:
+                solid_info["point_a"] = Vec3(0, 0, 0)
+                solid_info["point_b"] = Point3(0, 0, 1)
+                solid_info["radius"] = 0.3
+            point_a = solid_info["point_a"]
+            point_b = solid_info["point_b"]
+            radius = solid_info["radius"]
+            col = CollisionCapsule(point_a, point_b, radius)
+        elif solid_type == "CollisionLine":
+            if solid_info == {}:
+                solid_info["origin"] = Point3(0, 0, 0)
+                solid_info["direction"] = Vec3(0, 0, 1)
+            origin = solid_info["origin"]
+            direction = solid_info["direction"]
+            col = CollisionLine(origin, direction)
+        elif solid_type == "CollisionSegment":
+            if solid_info == {}:
+                solid_info["point_a"] = Vec3(0, 0, 0)
+                solid_info["point_b"] = Point3(0, 0, 1)
+            point_a = solid_info["point_a"]
+            point_b = solid_info["point_b"]
+            col = CollisionSegment(point_a, point_b)
+        elif solid_type == "CollisionRay":
+            if solid_info == {}:
+                solid_info["origin"] = Point3(0, 0, 0)
+                solid_info["direction"] = Vec3(0, 0, 1)
+            origin = solid_info["origin"]
+            direction = solid_info["direction"]
+            col = CollisionRay(origin, direction)
+        #elif solid_type == "Parabola":
+        elif solid_type == "CollisionInvSphere":
+            if solid_info == {}:
+                solid_info["center"] = Point3(0, 0, 0)
+                solid_info["radius"] = 1
+            center = solid_info["center"]
+            radius = solid_info["radius"]
+            col = CollisionInvSphere(center,radius)
+        else:
+            logging.warning(f"Unsupported collision solid type {solid_type}.")
+            return
+
+        col_np.set_tag("collision_solid_info", str(solid_info))
+        cn.addSolid(col)
 
         #TODO: HOW DO WE ADD THE COL SOLID INITIALISATION STUFF HERE (ORIGIN, RADIUS, SIZE, ETC)?
         #THIS ALSO NEEDS TO BE DONE FOR EXPORTING AND SAVING
@@ -151,9 +222,42 @@ class Core(TransformationHandler, SelectionHandler):
         self.models.append(col_np)
 
         base.messenger.send("update_structure")
+        return col_np
+
+    def add_light(self, light_type, light_info):
+        light_model_np = None
+        light_np = None
+        light = None
+
+        if light_type == "PointLight":
+            light_model_np = loader.loadModel("models/misc/Pointlight")
+            light = PointLight('Point Light')
+
+        elif light_type == "DirectionalLight":
+            light_model_np = loader.loadModel("models/misc/Dirlight")
+            light = DirectionalLight('Directional Light')
+
+        elif light_type == "AmbientLight":
+            light_model_np = NodePath("Scene Ambient Light")
+            light = AmbientLight('Ambient Light')
+
+        elif light_type == "Spotlight":
+            light_model_np = loader.loadModel("models/misc/Spotlight")
+            light = Spotlight('Spotlight')
+            lens = PerspectiveLens()
+            light.setLens(lens)
+
+        light_np = light_model_np.attachNewNode(light)
+        light_model_np.set_tag("object_type", "light")
+        light_model_np.set_tag("light_type", light_type)
+        light_model_np.set_tag("scene_object_id", str(uuid4()))
+        light_model_np.reparent_to(self.scene_model_parent)
+        self.scene_model_parent.setLight(light_np)
+
+        base.messenger.send("update_structure")
+        return light_model_np
 
     def move_element_in_structure(self, direction=1, objects=None):
-        print(direction)
         if objects is None:
             objects = self.selected_objects
 
@@ -219,6 +323,13 @@ class Core(TransformationHandler, SelectionHandler):
             for obj in self.copied_objects:
                 new_obj = obj.copy_to(parent)
                 new_obj.set_tag("scene_object_id", str(uuid4()))
+                if obj.get_tag("object_type") == "collision":
+                    todo
+                elif obj.get_tag("object_type") == "light":
+                    light_np = light_model_np.attachNewNode(light)
+                    new_obj.set_tag("object_type", "light")
+                    new_obj.set_tag("light_type", light_type)
+                    self.scene_model_parent.setLight(new_obj.children[0])
                 self.models.append(new_obj)
                 self.select(new_obj, True)
 
@@ -258,6 +369,8 @@ class Core(TransformationHandler, SelectionHandler):
         elif workOn.action == "kill" and workOn.objectType == "element":
             logging.debug(f"undo last kill {workOn.editObject}")
             workOn.editObject.unstash()
+            if workOn.get_tag("object_type") == "light":
+                self.scene_model_parent.setLight(workOn.children[0])
             base.messenger.send("update_structure")
 
         elif workOn.action == "copy":

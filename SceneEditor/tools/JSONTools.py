@@ -40,10 +40,28 @@ class JSONTools:
                 "scale":str(scene_object.get_scale()),
                 "parent":scene_object.parent.get_name(),
             }
+        elif object_type == "empty":
+            return {
+                "object_type":object_type,
+                "pos":str(scene_object.get_pos()),
+                "hpr":str(scene_object.get_hpr()),
+                "scale":str(scene_object.get_scale()),
+                "parent":scene_object.parent.get_name(),
+            }
         elif object_type == "collision":
             return {
                 "object_type":object_type,
                 "collision_solid_type":scene_object.get_tag("collision_solid_type"),
+                "pos":str(scene_object.get_pos()),
+                "hpr":str(scene_object.get_hpr()),
+                "scale":str(scene_object.get_scale()),
+                "parent":scene_object.parent.get_name(),
+                "collision_solid_info":scene_object.get_tag("collision_solid_info")
+            }
+        elif object_type == "light":
+            return {
+                "object_type":object_type,
+                "light_type":scene_object.get_tag("light_type"),
                 "pos":str(scene_object.get_pos()),
                 "hpr":str(scene_object.get_hpr()),
                 "scale":str(scene_object.get_scale()),

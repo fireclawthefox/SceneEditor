@@ -15,7 +15,7 @@ from direct.showbase.DirectObject import DirectObject
 from direct.gui import DirectGuiGlobals as DGG
 
 from panda3d.core import TextNode
-from panda3d.core import LVecBase2f, LVecBase3f, LVecBase4f, LPoint2f, LPoint3f, LPoint4f
+from panda3d.core import LVecBase2f, LVecBase3f, LVecBase4f, LPoint2f, LPoint3f, LPoint4f, LVector3f
 from panda3d.core import LVecBase2, LVecBase3, LVecBase4, LPoint2, LPoint3, LPoint4
 
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
@@ -93,17 +93,52 @@ class ProjectLoader(DirectObject):
         base.messenger.send("update_structure")
 
     def __createElement(self, name, info):
-        # create the element
-        model = self.core.load_model(info["filepath"])
-        model.set_name(name)
-        #TODO: We probably shouldn't use eval here
-        model.set_pos(eval(info["pos"]))
-        model.set_hpr(eval(info["hpr"]))
-        model.set_scale(eval(info["scale"]))
-        parent_name = info["parent"]
-        if parent_name != "scene_model_parent":
-            parents = self.core.models[:]
-            for obj in parents.reverse():
-                if obj.get_name() == parent_name:
-                    model.reparent_to(obj)
-                    break
+        object_type = info["object_type"]
+
+        if object_type == "model":
+            # create the element
+            model = self.core.load_model(info["filepath"])
+            model.set_name(name)
+            #TODO: We probably shouldn't use eval here
+            model.set_pos(eval(info["pos"]))
+            model.set_hpr(eval(info["hpr"]))
+            model.set_scale(eval(info["scale"]))
+            parent_name = info["parent"]
+            if parent_name != "scene_model_parent":
+                parents = self.core.models[:]
+                for obj in parents.reverse():
+                    if obj.get_name() == parent_name:
+                        model.reparent_to(obj)
+                        break
+        elif object_type == "empty":
+            # create the element
+            model = self.core.add_empty()
+            model.set_name(name)
+            #TODO: We probably shouldn't use eval here
+            model.set_pos(eval(info["pos"]))
+            model.set_hpr(eval(info["hpr"]))
+            model.set_scale(eval(info["scale"]))
+            parent_name = info["parent"]
+            if parent_name != "scene_model_parent":
+                parents = self.core.models[:]
+                for obj in parents.reverse():
+                    if obj.get_name() == parent_name:
+                        model.reparent_to(obj)
+                        break
+        elif object_type == "collision":
+            # create the element
+            model = self.core.add_collision_solid(
+                info["collision_solid_type"],
+                eval(info["collision_solid_info"]))
+            model.set_name(name)
+            #TODO: We probably shouldn't use eval here
+            model.set_pos(eval(info["pos"]))
+            model.set_hpr(eval(info["hpr"]))
+            model.set_scale(eval(info["scale"]))
+            parent_name = info["parent"]
+            if parent_name != "scene_model_parent":
+                parents = self.core.models[:]
+                for obj in parents.reverse():
+                    if obj.get_name() == parent_name:
+                        model.reparent_to(obj)
+                        break

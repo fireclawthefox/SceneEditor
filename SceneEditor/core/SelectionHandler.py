@@ -37,6 +37,9 @@ class SelectionHandler:
         self.selection_highlight_marker.setScale(0.3)
         self.selection_highlight_marker.hide()
 
+    def has_objects_selected(self):
+        return len(self.selected_objects) > 0
+
     def update_selection_mouse_watcher(self):
         dr = base.cam.node().get_display_region(0)
         self.selction_mouse_watcher.setDisplayRegion(dr)
@@ -101,6 +104,10 @@ class SelectionHandler:
 
         for obj in objs:
             self.deselect(obj)
+
+            if obj.get_tag("object_type") == "light":
+                self.scene_model_parent.clearLight(obj.find("+Light"))
+
             obj.stash()
             if includeWithKillCycle:
                 base.messenger.send("addToKillRing",
