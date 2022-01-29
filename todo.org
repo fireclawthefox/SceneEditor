@@ -1,31 +1,31 @@
-* TODO Base features [77%]
+* TODO Base features [88%]
   - [X] Adding models
   - [X] Moving models
   - [X] Rotating models
   - [X] Scaling models
   - [X] Deleting models
-  - [ ] Add Empties
+  - [X] Add Empties
   - [X] Show model origin
   - [ ] Edit object properties
     - Name
     - Transformation
   - [X] Undo/Redo (take kill cycle from DGui Editor)
-* TODO Edit Collision solids [20%]
+* TODO Edit Collision solids [80%]
   - [X] Add any kind of panda3d solids
   - [ ] Edit solid properties
     - collision masks
     - Name
-  - [ ] Save solids
+  - [X] Save solids
     - Can we get solid details from the col_np.node()?
-  - [ ] Load solids
-  - [ ] Export solids
+  - [X] Load solids
+  - [X] Export solids
 * TODO Camera editing [0%]
   - [ ] Add camera
   - [ ] Edit camera properties
     - Name
     - Lense properties
-* TODO Scene lighting [0%]
-  - [ ] Add lamps
+* TODO Scene lighting [50%]
+  - [X] Add lamps
   - [ ] Edit lamp properties
     - name
     - color
@@ -39,6 +39,8 @@
   - [ ] Help Dialog
   - [ ] Configuration Dialog
   - [ ] Asset browser
+* TODO Physics [0%]
+  - [ ] Can we add force fields or the like with the internal engine?
 * DONE Exporting [100%]
   - [X] Export all objects and settings as python class
     - Make sure they can be directly used and don't do too much (similar to exported GUI python script)
