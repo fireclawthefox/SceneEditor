@@ -143,3 +143,20 @@ class ProjectLoader(DirectObject):
                     if obj.get_name() == parent_name:
                         model.reparent_to(obj)
                         break
+        elif object_type == "light":
+            # create the element
+            model = self.core.add_light(
+                info["light_type"],
+                {})
+            model.set_name(name)
+            #TODO: We probably shouldn't use eval here
+            model.set_pos(eval(info["pos"]))
+            model.set_hpr(eval(info["hpr"]))
+            model.set_scale(eval(info["scale"]))
+            parent_name = info["parent"]
+            if parent_name != "scene_model_parent":
+                parents = self.core.models[:]
+                for obj in parents.reverse():
+                    if obj.get_name() == parent_name:
+                        model.reparent_to(obj)
+                        break
