@@ -75,9 +75,9 @@ class ExporterPy:
         if hasattr(root, "get_children"):
             for obj in root.get_children():
                 if obj in self.objects and not obj.is_stashed():
+                    obj_name = self.get_save_object_name(obj.get_name())
                     if obj.get_tag("object_type") == "model":
-                        obj_name = obj.get_name().replace(".", "_")
-                        model_path = f"\"{obj.get_tag('filepath')}\""
+                        model_path = f"'{obj.get_tag('filepath')}'"
                         self.content += " "*8 + f"self.{obj_name} = loader.load_model({model_path})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_hpr({obj.get_hpr()})\n"
@@ -85,7 +85,6 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.reparent_to({root_name})\n\n"
 
                     if obj.get_tag("object_type") == "empty":
-                        obj_name = obj.get_name().replace(".", "_")
                         self.content += " "*8 + f"self.{obj_name} = NodePath('{obj_name}')\n"
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_hpr({obj.get_hpr()})\n"
@@ -93,7 +92,6 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.reparent_to({root_name})\n\n"
 
                     elif obj.get_tag("object_type") == "collision":
-                        obj_name = obj.get_name().replace(".", "_")
                         self.content += " "*8 + f"col = {obj.get_tag('collision_solid_type')}(\n"
                         for key, value in eval(obj.get_tag('collision_solid_info')).items():
                             if key == "plane":
@@ -103,7 +101,7 @@ class ExporterPy:
                             else:
                                 self.content += " "*12 + f"{value},\n"
                         self.content += " "*8 + f")\n"
-                        self.content += " "*8 + f"cn = CollisionNode(\"{obj.get_name()}\")\n"
+                        self.content += " "*8 + f"cn = CollisionNode('{obj.get_name()}')\n"
                         self.content += " "*8 + f"cn.addSolid(col)\n"
                         self.content += " "*8 + f"self.{obj_name} = {root_name}.attachNewNode(cn)\n"
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
@@ -111,7 +109,7 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n\n"
 
                     elif obj.get_tag("object_type") == "light":
-                        self.content += " "*8 + f"light = {obj.get_tag('light_type')}({obj.get_name()})\n"
+                        self.content += " "*8 + f"light = {obj.get_tag('light_type')}('{obj.get_name()}')\n"
                         if obj.get_tag('light_type') == "Spotlight":
                             self.content += " "*8 + f"lens = PerspectiveLens()\n"
                             self.content += " "*8 + f"light.setLens(lens)\n"
@@ -119,9 +117,18 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_hpr({obj.get_hpr()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n"
-                        self.content += " "*8 + f"self.{root_name}.setLight(self.{obj_name})\n\n"
+                        self.content += " "*8 + f"{root_name}.setLight(self.{obj_name})\n\n"
 
                 self.write_scene_element(obj, obj.get_name())
+
+    def get_save_object_name(self, name):
+        unsave_characters = [
+            ",", ".",  ";", ":", "+", "-", "/", "\\","<", ">", "\"", "\'", "#",
+            "*", "~", "!", "§", "$", "%", "&", "(", ")", "[", "]", "{", "}",
+            "?", "`", "'", "|", "^", "°"]
+        for unsave_char in unsave_characters:
+            name = name.replace(unsave_char, "_")
+        return name
 
     def save(self, doSave):
         if doSave:
