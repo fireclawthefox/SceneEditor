@@ -25,13 +25,14 @@ G - Move selected objects
 R - Rotate selected objects around objects center
 X, Y and Z - During moving and rotating clips to the respective axis
 Del - Remove objects
-Ctrl-U - Undo
+Ctrl-Z - Undo
+Ctrl-Y - Redo
+Ctrl-Shift-Y - Switch between redo branches
 C - Show collision solids
 H - Toggle model hidden status
 
 ## WIP
-Kill cycle
-currently undo works but redo does not yet. Hence also the switching between redo and undo branches won't work
+
 
 ## Planed Features
 - Scaling objects
