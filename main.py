@@ -56,7 +56,7 @@ class SceneEditor(ShowBase):
 
         base.cTrav = CollisionTraverser("base traverser")
 
-        self.mainView.structurePanel.refreshStructureTree(self.core.models, self.core.selected_objects)
+        self.mainView.structurePanel.refreshStructureTree(self.core.scene_objects, self.core.selected_objects)
 
         self.dlg_quit = None
         self.dlg_new_project = None
@@ -331,7 +331,7 @@ class SceneEditor(ShowBase):
         self.browser = None
 
     def update_structure_panel(self):
-        self.mainView.structurePanel.refreshStructureTree(self.core.models, self.core.selected_objects)
+        self.mainView.structurePanel.refreshStructureTree(self.core.scene_objects, self.core.selected_objects)
 
     def disableEvents(self):
         self.ignoreAll()
@@ -383,7 +383,7 @@ class SceneEditor(ShowBase):
             self.lastDirPath,
             self.lastFileNameWOExtension + ".json",
             self.core.scene_model_parent,
-            self.core.models,
+            self.core.scene_objects,
             tooltip=self.tt)
 
     def export(self):
@@ -391,7 +391,7 @@ class SceneEditor(ShowBase):
             self.lastDirPath,
             self.lastFileNameWOExtension + ".py",
             self.core.scene_model_parent,
-            self.core.models,
+            self.core.scene_objects,
             self.tt)
 
     def load(self):

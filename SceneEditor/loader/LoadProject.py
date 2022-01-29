@@ -106,7 +106,7 @@ class ProjectLoader(DirectObject):
             model.set_scale(eval(info["scale"]))
             parent_name = info["parent"]
             if parent_name != "scene_model_parent":
-                parents = self.core.models[:]
+                parents = self.core.scene_objects[:]
                 for obj in parents.reverse():
                     if obj.get_name() == parent_name:
                         model.reparent_to(obj)
@@ -121,7 +121,7 @@ class ProjectLoader(DirectObject):
             model.set_scale(eval(info["scale"]))
             parent_name = info["parent"]
             if parent_name != "scene_model_parent":
-                parents = self.core.models[:]
+                parents = self.core.scene_objects[:]
                 for obj in parents.reverse():
                     if obj.get_name() == parent_name:
                         model.reparent_to(obj)
@@ -138,7 +138,7 @@ class ProjectLoader(DirectObject):
             model.set_scale(eval(info["scale"]))
             parent_name = info["parent"]
             if parent_name != "scene_model_parent":
-                parents = self.core.models[:]
+                parents = self.core.scene_objects[:]
                 for obj in parents.reverse():
                     if obj.get_name() == parent_name:
                         model.reparent_to(obj)
@@ -155,7 +155,7 @@ class ProjectLoader(DirectObject):
             model.set_scale(eval(info["scale"]))
             parent_name = info["parent"]
             if parent_name != "scene_model_parent":
-                parents = self.core.models[:]
+                parents = self.core.scene_objects[:]
                 for obj in parents.reverse():
                     if obj.get_name() == parent_name:
                         model.reparent_to(obj)
