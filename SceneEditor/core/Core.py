@@ -141,7 +141,13 @@ class Core(TransformationHandler, SelectionHandler):
         return model
 
     def add_collision_solid(self, solid_type, solid_info):
-        cn = CollisionNode("collision_node")
+        i = 1
+        solid_name = f"{solid_type}_{i}"
+        while self.scene_model_parent.find(f"**/{solid_name}"):
+            i += 1
+            solid_name = f"{solid_type}_{i}"
+
+        cn = CollisionNode(solid_name)
         col_np = self.scene_model_parent.attachNewNode(cn)
         col_np.show()
         col_np.set_tag("object_type", "collision")
@@ -159,17 +165,19 @@ class Core(TransformationHandler, SelectionHandler):
         elif solid_type == "CollisionBox":
             if solid_info == {}:
                 solid_info["center"] = Point3(0, 0, 0)
-                solid_info["dimensions"] = Point3(1, 1, 1)
+                solid_info["x"] = 1
+                solid_info["y"] = 1
+                solid_info["z"] = 1
             center = solid_info["center"]
-            dimensions = solid_info["dimensions"]
-            col = CollisionBox(center, dimensions.x, dimensions.y, dimensions.z)
+            x = solid_info["x"]
+            y = solid_info["y"]
+            z = solid_info["z"]
+            col = CollisionBox(center, x, y, z)
         elif solid_type == "CollisionPlane":
             if solid_info == {}:
-                solid_info["normal"] = Vec3(0, 0, 1)
-                solid_info["position"] = Point3(0, 0, 0)
-            normal = solid_info["normal"]
-            position = solid_info["position"]
-            col = CollisionPlane(Plane(normal, position))
+                solid_info["plane"] = Plane(Vec3(0,0,1), Point3(0,0,0))
+            plane = solid_info["plane"]
+            col = CollisionPlane(plane)
         elif solid_type == "CollisionCapsule":
             if solid_info == {}:
                 solid_info["point_a"] = Vec3(0, 0, 0)
@@ -212,13 +220,12 @@ class Core(TransformationHandler, SelectionHandler):
             logging.warning(f"Unsupported collision solid type {solid_type}.")
             return
 
-        col_np.set_tag("collision_solid_info", str(solid_info))
+        if solid_type == "CollisionPlane":
+            # BUG https://github.com/panda3d/panda3d/issues/1248
+            col_np.set_tag("collision_solid_info", str(solid_info).replace(" ", ", ").replace(":,", ":"))
+        else:
+            col_np.set_tag("collision_solid_info", str(solid_info))
         cn.addSolid(col)
-
-        #TODO: HOW DO WE ADD THE COL SOLID INITIALISATION STUFF HERE (ORIGIN, RADIUS, SIZE, ETC)?
-        #THIS ALSO NEEDS TO BE DONE FOR EXPORTING AND SAVING
-        #LOADING IS COMPLETELY MISSING YET
-
         self.models.append(col_np)
 
         base.messenger.send("update_structure")

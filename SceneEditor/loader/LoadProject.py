@@ -17,6 +17,7 @@ from direct.gui import DirectGuiGlobals as DGG
 from panda3d.core import TextNode
 from panda3d.core import LVecBase2f, LVecBase3f, LVecBase4f, LPoint2f, LPoint3f, LPoint4f, LVector3f
 from panda3d.core import LVecBase2, LVecBase3, LVecBase4, LPoint2, LPoint3, LPoint4
+from panda3d.core import LPlane
 
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 
