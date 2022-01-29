@@ -106,7 +106,7 @@ class SelectionHandler:
             self.deselect(obj)
 
             if obj.get_tag("object_type") == "light":
-                self.scene_model_parent.clearLight(obj.find("+Light"))
+                self.scene_model_parent.clear_light(obj.find("+Light"))
 
             obj.stash()
             if includeWithKillCycle:
@@ -117,7 +117,7 @@ class SelectionHandler:
         base.messenger.send("update_structure")
 
     def remove_all(self):
-        for obj in self.models[:]:
+        for obj in self.scene_objects[:]:
             self.deselect(obj)
             obj.stash()
 

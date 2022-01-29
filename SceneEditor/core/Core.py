@@ -39,7 +39,7 @@ class Core(TransformationHandler, SelectionHandler):
     def __init__(self):
         self.killRing = KillRing()
 
-        self.models = []
+        self.scene_objects = []
 
         self.selected_objects = []
 
@@ -68,13 +68,13 @@ class Core(TransformationHandler, SelectionHandler):
         self.limiting_y = False
         self.limiting_z = False
 
-        for obj in self.models[:]:
+        for obj in self.scene_objects[:]:
             self.deselect(obj)
             obj.remove_node()
 
         self.scene_model_parent.clearLight()
 
-        self.models = []
+        self.scene_objects = []
         self.limit_line.reset()
         self.limit_line_np.stash()
         base.messenger.send("update_structure")
@@ -125,7 +125,10 @@ class Core(TransformationHandler, SelectionHandler):
         model.set_tag("object_type", "model")
         model.set_tag("scene_object_id", str(uuid4()))
         model.reparent_to(self.scene_model_parent)
-        self.models.append(model)
+        self.scene_objects.append(model)
+
+        base.messenger.send("addToKillRing",
+            [model, "add", "model", None, None])
 
         base.messenger.send("update_structure")
         return model
@@ -135,7 +138,10 @@ class Core(TransformationHandler, SelectionHandler):
         model.set_tag("object_type", "empty")
         model.set_tag("scene_object_id", str(uuid4()))
         model.reparent_to(self.scene_model_parent)
-        self.models.append(model)
+        self.scene_objects.append(model)
+
+        base.messenger.send("addToKillRing",
+            [model, "add", "empty", None, None])
 
         base.messenger.send("update_structure")
         return model
@@ -226,7 +232,10 @@ class Core(TransformationHandler, SelectionHandler):
         else:
             col_np.set_tag("collision_solid_info", str(solid_info))
         cn.addSolid(col)
-        self.models.append(col_np)
+        self.scene_objects.append(col_np)
+
+        base.messenger.send("addToKillRing",
+            [col_np, "add", "collision", None, None])
 
         base.messenger.send("update_structure")
         return col_np
@@ -235,6 +244,12 @@ class Core(TransformationHandler, SelectionHandler):
         light_model_np = None
         light_np = None
         light = None
+
+        i = 1
+        light_name = f"{light_type}_{i}"
+        while self.scene_model_parent.find(f"**/{light_name}"):
+            i += 1
+            light_name = f"{light_type}_{i}"
 
         if light_type == "PointLight":
             light_model_np = loader.loadModel("models/misc/Pointlight")
@@ -245,7 +260,7 @@ class Core(TransformationHandler, SelectionHandler):
             light = DirectionalLight('Directional Light')
 
         elif light_type == "AmbientLight":
-            light_model_np = NodePath("Scene Ambient Light")
+            light_model_np = NodePath(light_name)
             light = AmbientLight('Ambient Light')
 
         elif light_type == "Spotlight":
@@ -254,12 +269,19 @@ class Core(TransformationHandler, SelectionHandler):
             lens = PerspectiveLens()
             light.setLens(lens)
 
+        light_model_np.set_name(light_name)
+        light_model_np.set_light_off()
         light_np = light_model_np.attachNewNode(light)
         light_model_np.set_tag("object_type", "light")
         light_model_np.set_tag("light_type", light_type)
         light_model_np.set_tag("scene_object_id", str(uuid4()))
         light_model_np.reparent_to(self.scene_model_parent)
         self.scene_model_parent.setLight(light_np)
+
+        self.scene_objects.append(light_model_np)
+
+        base.messenger.send("addToKillRing",
+            [light_model_np, "add", "light", None, None])
 
         base.messenger.send("update_structure")
         return light_model_np
@@ -283,14 +305,14 @@ class Core(TransformationHandler, SelectionHandler):
         if self.show_collisions:
             print("HIDE COLLISIONS")
             base.cTrav.hide_collisions()
-            for obj in self.models:
+            for obj in self.scene_objects:
                 collisionNodes = obj.find_all_matches("**/+CollisionNode")
                 for collisionNode in collisionNodes:
                     collisionNode.hide()
         else:
             print("SHOW COLLISIONS")
             base.cTrav.show_collisions(render)
-            for obj in self.models:
+            for obj in self.scene_objects:
                 collisionNodes = obj.find_all_matches("**/+CollisionNode")
                 for collisionNode in collisionNodes:
                     collisionNode.show()
@@ -317,6 +339,8 @@ class Core(TransformationHandler, SelectionHandler):
             self.deselect_all()
             for obj in self.cut_objects:
                 if obj == parent: continue
+                base.messenger.send("addToKillRing",
+                    [obj, "cut", "element", obj.get_parent(), parent])
                 obj.reparent_to(parent)
                 self.select(obj, True)
             self.cut_objects = []
@@ -337,8 +361,11 @@ class Core(TransformationHandler, SelectionHandler):
                     new_obj.set_tag("object_type", "light")
                     new_obj.set_tag("light_type", light_type)
                     self.scene_model_parent.setLight(new_obj.children[0])
-                self.models.append(new_obj)
+                self.scene_objects.append(new_obj)
                 self.select(new_obj, True)
+
+                base.messenger.send("addToKillRing",
+                    [new_obj, "copy", "element", None, None])
 
         base.messenger.send("update_structure")
         base.messenger.send("start_moving")
@@ -369,21 +396,26 @@ class Core(TransformationHandler, SelectionHandler):
             elif workOn.objectType == "scale":
                 logging.debug(f"undo Scale to {workOn.oldValue}")
                 workOn.editObject.set_scale(workOn.oldValue)
-        elif workOn.action == "add" and workOn.objectType == "element":
+        elif workOn.action == "add":
             logging.debug(f"undo remove added element {workOn.editObject}")
             self.remove([workOn.editObject], False)
 
         elif workOn.action == "kill" and workOn.objectType == "element":
             logging.debug(f"undo last kill {workOn.editObject}")
             workOn.editObject.unstash()
-            if workOn.get_tag("object_type") == "light":
-                self.scene_model_parent.setLight(workOn.children[0])
+            if workOn.editObject.get_tag("object_type") == "light":
+                self.scene_model_parent.set_light(workOn.editObject.find("+Light"))
             base.messenger.send("update_structure")
 
         elif workOn.action == "copy":
             logging.debug(f"undo last copy {workOn.objectType}")
             if workOn.objectType == "element":
                 self.remove([workOn.editObject], False)
+
+        elif workOn.action == "cut":
+            logging.debug(f"undo last cut {workOn.objectType}")
+            if workOn.objectType == "element":
+                workOn.editObject.reparent_to(workOn.oldValue)
 
         if len(self.selected_objects):
             self.selection_highlight_marker.setPos(self.get_selection_middle_point())
@@ -415,9 +447,11 @@ class Core(TransformationHandler, SelectionHandler):
                 else:
                     workOn.editObject.set_scale(workOn.newValue)
 
-        elif workOn.action == "add" and workOn.objectType == "element":
+        elif workOn.action == "add":
             workOn.editObject.unstash()
             base.messenger.send("update_structure")
+            if workOn.editObject.get_tag("object_type") == "light":
+                self.scene_model_parent.set_light(workOn.editObject.find("+Light"))
 
         elif workOn.action == "kill" and workOn.objectType == "element":
             self.remove([workOn.editObject], False)
@@ -427,6 +461,14 @@ class Core(TransformationHandler, SelectionHandler):
             if workOn.objectType == "element":
                 workOn.editObject.unstash()
                 base.messenger.send("update_structure")
+                if workOn.editObject.get_tag("object_type") == "light":
+                    self.scene_model_parent.set_light(workOn.editObject.find("+Light"))
+
+        elif workOn.action == "cut":
+            logging.debug(f"undo last cut {workOn.objectType}")
+            if workOn.objectType == "element":
+                workOn.editObject.reparent_to(workOn.newValue)
+
 
         if len(self.selected_objects):
             self.selection_highlight_marker.setPos(self.get_selection_middle_point())
