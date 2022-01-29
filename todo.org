@@ -45,10 +45,18 @@
   - [X] Export all objects and settings as python class
     - Make sure they can be directly used and don't do too much (similar to exported GUI python script)
   - [X] Export as project JSON
-* TODO Extended features [16%]
+* TODO Extended features [7%]
   - [ ] Nicer highlighting/outlining of selected models
-  - [ ] Texture editing
+  - [ ] Texture and Material editing
   - [ ] adding shaders to objects
   - [ ] Make objects placeable on other objects (taking normals) and optionally rotate to fit normals of hit objects
   - [ ] Edit Render attributes of objects (e.g. bilboard, compass, etc...)
   - [X] Make sure the 3D space is not occupied by other panels e.g. it scales and is centered between other panels
+  - [ ] Memory viewer (how does the direct session panel does it?)
+  - [ ] Curve and Mopath editing
+  - [ ] Particle adding/editing
+  - [ ] Heightmap and ground texture painting
+  - [ ] LOD node editing
+  - [ ] Simple onscreen text adding
+  - [ ] Set render effects (Billboard and compass)
+  - [ ] Transform objects with displayed widgets
