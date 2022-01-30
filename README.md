@@ -20,7 +20,8 @@ To start the Scene Editor, simply run the main.py script
 
 ### Shortcuts
 #### Basic
-|--|--|
+|shortcut|action|
+|---|---|
 |Ctrl-Q|Quit the editor|
 |Ctrl-N|New Scene|
 |Ctrl-O|Open Scene from JSON format|
@@ -29,7 +30,8 @@ To start the Scene Editor, simply run the main.py script
 
 #### Navigation
 Navigating the scene is similar to Blender in that you can move around with the mouse.
-|--|--|
+|shortcut|action|
+|---|---|
 |Middle mouse button|Rotate around pivot|
 |Shift + Middle mouse button|Pan|
 |mouse wheel|Zoom|
@@ -45,7 +47,8 @@ Navigating the scene is similar to Blender in that you can move around with the 
 |Ctrl-3|Show left|
 
 #### Editing
-|--|--|
+|shortcut|action|
+|---|---|
 |G|Move selected objects|
 |R|Rotate selected objects around objects center|
 |S|Scale selected objects|
@@ -74,9 +77,11 @@ The python script will always contain a class called Scene which you can pass a 
 Here is a small example of how to load and instantiate a Scene. We expect the scene to be exported to a file called myScene.py and contain a model named panda:
 <code><pre>from myScene import Scene as MyScene
 myScene = MyScene()
-# access an object from the scene
 myScene.panda.set_pos(0,0,0)
 </pre></code>
+
+## Screenshots
+<img src="https://raw.githubusercontent.com/fireclawthefox/SceneEditor/main/Screenshots/SceneEditor.png" />
 
 ## WIP
 Not all values will be saved and loaded yet
