@@ -56,9 +56,9 @@ class MenuBar(DirectObject):
             DirectMenuItemEntry("Copy", base.messenger.send, ["copyElement"]),
             DirectMenuItemEntry("Cut", base.messenger.send, ["cutElement"]),
             DirectMenuItemEntry("Paste", base.messenger.send, ["pasteElement"]),
-            DirectMenuSeparator(),
-            DirectMenuItemEntry("Options", base.messenger.send, ["showSettings"]),
-            DirectMenuItemEntry("Help", base.messenger.send, ["showHelp"]),
+            #DirectMenuSeparator(),
+            #DirectMenuItemEntry("Options", base.messenger.send, ["showSettings"]),
+            #DirectMenuItemEntry("Help", base.messenger.send, ["showHelp"]),
         ]
         self.tools = self.__create_menu_item("Tools", toolsEntries)
 
