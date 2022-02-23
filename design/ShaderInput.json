@@ -1,0 +1,227 @@
+{
+  "ProjectVersion": "0.2a",
+  "EditorConfig": {
+    "usePixel2D": true,
+    "canvasSize": "(0, 1920, -1080, 0)"
+  },
+  "ComponentList": {
+    "frm_content": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameSize": "(0.0, 426.0, -24.0, 0.0)",
+        "frameColor": "(1, 1, 1, 1)",
+        "pos": "LPoint3f(0, 0, 0)",
+        "transparency": "0"
+      },
+      "type": "DirectFrame",
+      "parent": "root",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_input_name": {
+      "element": {
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "pos": "LPoint3f(7.5, 0, -16.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "text": "['']",
+        "width": "7.0",
+        "initialText": "'Input name'",
+        "overflow": "1",
+        "text0_scale": "(1, 1)"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_content",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "initialText": "Input name"
+      }
+    },
+    "frm_texture": {
+      "element": {
+        "relief": "3",
+        "borderWidth": "(1.0, 1.0)",
+        "frameSize": "(0.0, 300.0, -24.0, 0.0)",
+        "frameColor": "(1.0, 1.0, 1.0, 1.0)",
+        "pos": "LPoint3f(99.5, 0, 0)",
+        "transparency": "0"
+      },
+      "type": "DirectFrame",
+      "parent": "frm_content",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_texture_path": {
+      "element": {
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "pos": "LPoint3f(5.5, 0, -16.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "19.5",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_texture",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "btn_browse": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "pad": "(5.0, 5.0)",
+        "pos": "LPoint3f(268.5, 0, -16)",
+        "transparency": "0",
+        "text": "['browse']",
+        "text0_scale": "(12.0, 12.0)",
+        "text1_scale": "(12.0, 12.0)",
+        "text2_scale": "(12.0, 12.0)",
+        "text3_scale": "(12.0, 12.0)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_texture",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1
+      }
+    },
+    "btn_remove": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "pad": "(3.0, 1.0)",
+        "pos": "LPoint3f(411, 0, -19.5)",
+        "transparency": "0",
+        "text": "['X']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_content",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1
+      }
+    },
+    "frm_nodepath": {
+      "element": {
+        "relief": "3",
+        "borderWidth": "(1.0, 1.0)",
+        "frameSize": "(0.0, 300.0, -24.0, 0.0)",
+        "frameColor": "(1.0, 1.0, 1.0, 1.0)",
+        "pos": "LPoint3f(99.5, 0, 0)",
+        "transparency": "0"
+      },
+      "type": "DirectFrame",
+      "parent": "frm_content",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "cmb_nodepaths": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(0.2, 0.2)",
+        "pad": "(0.2, 0.2)",
+        "pos": "LPoint3f(5, 0, -15.5)",
+        "hpr": "LVecBase3f(0, 0, 0)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "popupMarker_pos": "None",
+        "text_align": "0",
+        "cancelframe_transparency": "0",
+        "item0_transparency": "0",
+        "popupMarker_transparency": "0",
+        "popupMenu_transparency": "0"
+      },
+      "type": "DirectOptionMenu",
+      "parent": "frm_nodepath",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "frm_vector": {
+      "element": {
+        "relief": "3",
+        "borderWidth": "(1.0, 1.0)",
+        "frameSize": "(0.0, 300.0, -24.0, 0.0)",
+        "frameColor": "(1.0, 1.0, 1.0, 1.0)",
+        "pos": "LPoint3f(99.5, 0, 0)",
+        "transparency": "0"
+      },
+      "type": "DirectFrame",
+      "parent": "frm_content",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_vec_1": {
+      "element": {
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "pos": "LPoint3f(12.5, 0, -16.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "5.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_vector",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_vec_2": {
+      "element": {
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "pos": "LPoint3f(82.5, 0, -16.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "5.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_vector",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_vec_3": {
+      "element": {
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "pos": "LPoint3f(152.5, 0, -16.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "5.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_vector",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_vec_4": {
+      "element": {
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "pos": "LPoint3f(222.5, 0, -16.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "5.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_vector",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    }
+  }
+}
