@@ -313,11 +313,11 @@ class DirectOptionMenu(DirectButton):
         pos = self.popupMenu.getPos(render2d)
         scale = self.popupMenu.getScale(render2d)
 
-        minZ = pos[2] + fb[2] * scale[2]
-        maxZ = pos[2] + fb[3] * scale[2]
-        if (minZ < -1.0 and direction > 0) or (maxZ > 1.0 and direction < 0):
-            oldZ = self.popupMenu.getZ()
-            self.popupMenu.setZ(oldZ + direction * self.maxHeight)
+        #minZ = pos[2] + fb[2] * scale[2]
+        #maxZ = pos[2] + fb[3] * scale[2]
+        #if (minZ < -1.0 and direction > 0) or (maxZ > 1.0 and direction < 0):
+        oldZ = self.popupMenu.getZ()
+        self.popupMenu.setZ(oldZ + direction * self.maxHeight)
 
     def _highlightItem(self, item, index):
         """ Set frame color of highlighted item, record index """
