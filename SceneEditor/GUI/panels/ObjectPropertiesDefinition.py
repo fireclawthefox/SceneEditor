@@ -31,7 +31,9 @@ class Definition:
             setFunctionName=None,
             addToExtraOptions=False,
             loaderFunc=None,
-            postProcessFunctionName=None):
+            postProcessFunctionName=None,
+            setAsTag=False,
+            lookupAttrs=None):
         # Name to be shown in the editor
         self.visiblename = visiblename
 
@@ -97,6 +99,9 @@ class Definition:
         else:
             self.editType = editType
 
+        self.setAsTag = setAsTag
+        self.lookupAttrs = lookupAttrs
+
 # definitions for DirectGuiWidget
 DEFAULT_DEFINITIONS = [
     Definition('name', 'Name', str, setFunctionName="setName"),
@@ -107,13 +112,65 @@ DEFAULT_DEFINITIONS = [
     Definition('transparency', 'Transparency', str, editType=t.optionMenu, valueOptions={"None":TransparencyAttrib.M_none,"Alpha":TransparencyAttrib.M_alpha,"Premultiplied Alpha":TransparencyAttrib.M_premultiplied_alpha,"Multisample":TransparencyAttrib.M_multisample,"Multisample Mask":TransparencyAttrib.M_multisample_mask,"Binary":TransparencyAttrib.M_binary,"Dual":TransparencyAttrib.M_dual}, getFunctionName="getTransparency", setFunctionName="setTransparency")
 ]
 
+COLLISION_LOOKUP_ATTRS={"node":[], "get_solid":[0]}
+
 DEFINITIONS = {
-    "model":DEFAULT_DEFINITIONS,
-    "empty":DEFAULT_DEFINITIONS,
-    "collision_CollisionSphere":DEFAULT_DEFINITIONS + [
-        Definition('center', 'Center', object, editType=t.base3),
-        Definition('radius', 'Radius', float),
+    #
+    # Model
+    #
+    "model":DEFAULT_DEFINITIONS + [
+        Definition('filepath', 'Filepath', str, setAsTag=True),
     ],
+
+    #
+    # Empty
+    #
+    "empty":DEFAULT_DEFINITIONS,
+
+    #
+    # Collision definitions
+    #
+    "CollisionSphere":DEFAULT_DEFINITIONS + [
+        Definition('center', 'Center', object, editType=t.base3, setFunctionName="set_center", lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('radius', 'Radius', float, setFunctionName="set_radius", lookupAttrs=COLLISION_LOOKUP_ATTRS),
+    ],
+    "CollisionBox":DEFAULT_DEFINITIONS + [
+        Definition('center', 'Center', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('dimension', 'Dimension', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+    ],
+    "CollisionPlane":DEFAULT_DEFINITIONS + [
+        #Definition('center', 'Center', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        #Definition('dimension', 'Dimension', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+    ],
+    "CollisionCapsule":DEFAULT_DEFINITIONS + [
+        Definition('point_a', 'Point A', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('point_b', 'Point B', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('radius', 'Radius', float, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+    ],
+    "CollisionLine":DEFAULT_DEFINITIONS + [
+        Definition('origin', 'Origin', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('direction', 'Direction', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+    ],
+    "CollisionSegment":DEFAULT_DEFINITIONS + [
+        Definition('point_a', 'Point A', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('point_b', 'Point B', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+    ],
+    "CollisionRay":DEFAULT_DEFINITIONS + [
+        Definition('origin', 'Origin', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('direction', 'Direction', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+    ],
+    "CollisionInvSphere":DEFAULT_DEFINITIONS + [
+        Definition('center', 'Center', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('radius', 'Radius', float, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+    ],
+
+    #
+    # Light
+    #
     "light_PointLight":DEFAULT_DEFINITIONS + [
     ]
+
+    #
+    # Camera
+    #
 }

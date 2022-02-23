@@ -16,11 +16,14 @@ from SceneEditor.GUI.MenuBar import MenuBar
 from SceneEditor.GUI.ToolBar import ToolBar
 from SceneEditor.GUI.panels.PropertiesPanel import PropertiesPanel
 from SceneEditor.GUI.panels.StructurePanel import StructurePanel
+from SceneEditor.GUI.dialogs.ShaderLoaderDialogManager import ShaderLoaderDialogManager
 
 
 class MainView(DirectObject):
-    def __init__(self, tooltip, grid):
+    def __init__(self, tooltip, grid, core):
         logging.debug("Setup GUI")
+
+        self.core = core
 
         splitterWidth = 8
         self.menuBarHeight = 24
@@ -127,6 +130,7 @@ class MainView(DirectObject):
         self.mainSplitter["firstFrameUpdateSizeFunc"] = self.sidebarSplitSizer.refresh
         self.mainSplitter["secondFrameUpdateSizeFunc"] = self.update_3d_display_region
 
+        self.accept("show_load_shader_dialog", self.show_load_shader_dialog)
 
         self.mainBox.refresh()
 
@@ -155,3 +159,12 @@ class MainView(DirectObject):
             base.getSize()[0]/2,
             0,
             base.getSize()[1] - self.menuBarHeight - self.toolBarHeight)
+
+    def show_load_shader_dialog(self):
+        base.messenger.send("unregisterKeyboardEvents")
+        ShaderLoaderDialogManager(self.close_load_shader_dialog, self.core.scene_objects)
+
+    def close_load_shader_dialog(self, accept, shader_details):
+        base.messenger.send("reregisterKeyboardEvents")
+        if accept:
+            base.messenger.send("addShader", [shader_details])

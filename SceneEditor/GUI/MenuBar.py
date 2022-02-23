@@ -83,7 +83,9 @@ class MenuBar(DirectObject):
                 DirectMenuItemEntry("Spotlight", base.messenger.send, ["addLight", ["Spotlight", {}]]),
                 DirectMenuItemEntry("Directional Light", base.messenger.send, ["addLight", ["DirectionalLight", {}]]),
                 DirectMenuItemEntry("Ambient Light", base.messenger.send, ["addLight", ["AmbientLight", {}]]),
-                ])
+                ]),
+            DirectMenuItemEntry("Camera", base.messenger.send, ["addCamera", ["Perspective", {}]]),
+            DirectMenuItemEntry("Shader", base.messenger.send, ["show_load_shader_dialog"]),
         ]
         #TODO: THE COLORS DON'T WORK CORRECT YET
         self.add = self.__create_menu_item("Add", addEntries)

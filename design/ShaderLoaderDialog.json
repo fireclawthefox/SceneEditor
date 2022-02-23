@@ -1,0 +1,469 @@
+{
+  "ProjectVersion": "0.2a",
+  "EditorConfig": {
+    "usePixel2D": true,
+    "canvasSize": "(0, 1920, -1080, 0)"
+  },
+  "ComponentList": {
+    "frm_main": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameSize": "(-250.0, 250.0, -250.0, 250.0)",
+        "frameColor": "(1, 1, 1, 1)",
+        "pos": "LPoint3f(337.5, 0, -331.5)",
+        "transparency": "0"
+      },
+      "type": "DirectFrame",
+      "parent": "root",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lbl_header": {
+      "element": {
+        "borderWidth": "(2.0, 2.0)",
+        "frameColor": "(0.0, 0.0, 0.0, 1.0)",
+        "pad": "(5.0, 5.0)",
+        "pos": "LPoint3f(-246, 0, 235)",
+        "transparency": "0",
+        "text": "['Shader loader']",
+        "text0_scale": "(14.0, 14.0)",
+        "text0_fg": "LVecBase4f(1, 1, 1, 1)",
+        "text0_align": "0"
+      },
+      "type": "DirectLabel",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "btn_ok": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "frameSize": "(-40.0, 40.0, -6.0, 22.0)",
+        "pos": "LPoint3f(112.5, 0, -235)",
+        "transparency": "0",
+        "text": "['Ok']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1
+      }
+    },
+    "frm_shader_input": {
+      "element": {
+        "state": "'normal'",
+        "relief": "3",
+        "frameSize": "(-225.0, 225.0, -75.0, 75.0)",
+        "frameColor": "(1, 1, 1, 1)",
+        "pos": "LPoint3f(0, 0, -120)",
+        "transparency": "0",
+        "canvasSize": "(-213.0, 213.0, -300.0, 300.0)",
+        "scrollBarWidth": "20",
+        "horizontalScroll_transparency": "0",
+        "horizontalScroll_decButton_transparency": "0",
+        "horizontalScroll_incButton_transparency": "0",
+        "horizontalScroll_thumb_transparency": "0",
+        "verticalScroll_transparency": "0",
+        "verticalScroll_decButton_transparency": "0",
+        "verticalScroll_incButton_transparency": "0",
+        "verticalScroll_thumb_transparency": "0"
+      },
+      "type": "DirectScrolledFrame",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "btn_add_shader_input": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "pad": "(4.0, 4.0)",
+        "pos": "LPoint3f(-216, 0, -213)",
+        "transparency": "0",
+        "text": "['+']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1
+      }
+    },
+    "lbl_shader_input": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-222.5, 0, -36.5)",
+        "transparency": "0",
+        "text": "['Shader input']",
+        "text0_scale": "(12.0, 12.0)",
+        "text0_align": "0"
+      },
+      "type": "DirectLabel",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_fragment_path": {
+      "element": {
+        "relief": "3",
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "frameColor": "(1.0, 1.0, 1.0, 1.0)",
+        "pad": "(0.5, 0.5)",
+        "pos": "LPoint3f(-154, 0, 4.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "25.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lbl_frag": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-194, 0, 4.5)",
+        "transparency": "0",
+        "text": "['Fragment']",
+        "text0_scale": "(12.0, 12.0)"
+      },
+      "type": "DirectLabel",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lbl_vertex": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-194, 0, 184.5)",
+        "transparency": "0",
+        "text": "['Vertex']",
+        "text0_scale": "(12.0, 12.0)"
+      },
+      "type": "DirectLabel",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_tessellation_ev_path": {
+      "element": {
+        "relief": "3",
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "frameColor": "(1.0, 1.0, 1.0, 1.0)",
+        "pad": "(0.5, 0.5)",
+        "pos": "LPoint3f(-154, 0, 94.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "25.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_tessellation_ctrl_path": {
+      "element": {
+        "relief": "3",
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "frameColor": "(1.0, 1.0, 1.0, 1.0)",
+        "pad": "(0.5, 0.5)",
+        "pos": "LPoint3f(-154, 0, 139.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "25.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_vertex_path": {
+      "element": {
+        "relief": "3",
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "frameColor": "(1.0, 1.0, 1.0, 1.0)",
+        "pad": "(0.5, 0.5)",
+        "pos": "LPoint3f(-154, 0, 184.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "25.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lbl_tessellation_ctrl": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-194, 0, 139.5)",
+        "transparency": "0",
+        "text": "['Tessellation ctrl']",
+        "text0_scale": "(12.0, 12.0)"
+      },
+      "type": "DirectLabel",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lbl_tessellation_ev": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-194, 0, 94.5)",
+        "transparency": "0",
+        "text": "['Tesselation ev']",
+        "text0_scale": "(12.0, 12.0)"
+      },
+      "type": "DirectLabel",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "txt_geometry_path": {
+      "element": {
+        "relief": "3",
+        "borderWidth": "(0.08333333333333333, 0.08333333333333333)",
+        "frameColor": "(1.0, 1.0, 1.0, 1.0)",
+        "pad": "(0.5, 0.5)",
+        "pos": "LPoint3f(-154, 0, 49.5)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "width": "25.0",
+        "overflow": "1"
+      },
+      "type": "DirectEntry",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "lbl_geometry": {
+      "element": {
+        "borderWidth": "(2, 2)",
+        "frameColor": "(0.8, 0.8, 0.8, 0.0)",
+        "pos": "LPoint3f(-194, 0, 49.5)",
+        "transparency": "0",
+        "text": "['Geometry']",
+        "text0_scale": "(12.0, 12.0)"
+      },
+      "type": "DirectLabel",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "btn_browse_vertex": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "pad": "(2.0, 2.0)",
+        "pos": "LPoint3f(197.5, 0, 180.5)",
+        "transparency": "0",
+        "text": "['browse']",
+        "extraArgs": "['']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1,
+        "command": "base.messenger.send",
+        "extraArgs": [
+          ""
+        ]
+      }
+    },
+    "btn_browse_tessellation_ctrl": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "pad": "(2.0, 2.0)",
+        "pos": "LPoint3f(197.5, 0, 135.5)",
+        "transparency": "0",
+        "text": "['browse']",
+        "command": "''",
+        "extraArgs": "['']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1,
+        "command": "",
+        "extraArgs": [
+          ""
+        ]
+      }
+    },
+    "btn_browse_tessellation_eval": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "pad": "(2.0, 2.0)",
+        "pos": "LPoint3f(197.5, 0, 90.5)",
+        "transparency": "0",
+        "text": "['browse']",
+        "command": "''",
+        "extraArgs": "['']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1,
+        "extraArgs": [
+          ""
+        ],
+        "command": ""
+      }
+    },
+    "btn_browse_geometry": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "pad": "(2.0, 2.0)",
+        "pos": "LPoint3f(197.5, 0, 45.5)",
+        "transparency": "0",
+        "text": "['browse']",
+        "command": "''",
+        "extraArgs": "['']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1,
+        "command": "",
+        "extraArgs": [
+          ""
+        ]
+      }
+    },
+    "btn_browse_fragment": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "pad": "(2.0, 2.0)",
+        "pos": "LPoint3f(197.5, 0, 0.5)",
+        "transparency": "0",
+        "text": "['browse']",
+        "command": "''",
+        "extraArgs": "['']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1,
+        "command": "",
+        "extraArgs": [
+          ""
+        ]
+      }
+    },
+    "cmb_shader_input_type": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "borderUvWidth": "(0.0, 0.1)",
+        "pos": "LPoint3f(-202.5, 0, -211)",
+        "scale": "LVecBase3f(12, 12, 12)",
+        "transparency": "0",
+        "text": "'Texture'",
+        "items": "['Texture', 'Nodepath', 'Vector']",
+        "popupMarker_pos": "None",
+        "text_align": "0",
+        "cancelframe_transparency": "0",
+        "item0_transparency": "0",
+        "item1_transparency": "0",
+        "item2_transparency": "0",
+        "popupMarker_transparency": "0",
+        "popupMenu_transparency": "0"
+      },
+      "type": "DirectOptionMenu",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {}
+    },
+    "btn_cancel": {
+      "element": {
+        "relief": "1",
+        "borderWidth": "(2, 2)",
+        "frameSize": "(-40.0, 40.0, -6.0, 22.0)",
+        "pos": "LPoint3f(202.5, 0, -234.5)",
+        "transparency": "0",
+        "text": "['Cancel']",
+        "text0_scale": "(24, 24)",
+        "text1_scale": "(24, 24)",
+        "text2_scale": "(24, 24)",
+        "text3_scale": "(24, 24)"
+      },
+      "type": "DirectButton",
+      "parent": "frm_main",
+      "command": null,
+      "extraArgs": null,
+      "extraOptions": {
+        "pressEffect": 1
+      }
+    }
+  }
+}

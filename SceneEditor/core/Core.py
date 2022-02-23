@@ -10,8 +10,12 @@ from SceneEditor.core.SelectionHandler import SelectionHandler
 from panda3d.core import (
     Plane,
     Vec3,
+    Vec4,
     Point3,
     NodePath,
+
+    # Shaders
+    Shader,
 
     # Collision solids
     CollisionNode,
@@ -32,7 +36,8 @@ from panda3d.core import (
     Spotlight,
 
     # Lens
-    PerspectiveLens
+    PerspectiveLens,
+    GeomNode
     )
 
 class Core(TransformationHandler, SelectionHandler):
@@ -240,6 +245,46 @@ class Core(TransformationHandler, SelectionHandler):
         base.messenger.send("update_structure")
         return col_np
 
+    def update_collision_info_tag(self, obj):
+        solid_type = obj.get_tag("collision_solid_type")
+        solid_info == {}
+        solid = obj.find("*/+CollisionNode")
+        if solid_type == "CollisionSphere":
+            solid_info["center"] = solid.center
+            solid_info["radius"] = solid.radius
+        elif solid_type == "CollisionBox":
+            solid_info["center"] = solid.center
+            solid_info["x"] = solid.dimensions.x
+            solid_info["y"] = solid.dimensions.y
+            solid_info["z"] = solid.dimensions.z
+        elif solid_type == "CollisionPlane":
+            solid_info["plane"] = solid.plane
+        elif solid_type == "CollisionCapsule":
+            solid_info["point_a"] = solid.point_a
+            solid_info["point_b"] = solid.point_b
+            solid_info["radius"] = solid.radius
+        elif solid_type == "CollisionLine":
+            solid_info["origin"] = solid.origin
+            solid_info["direction"] = solid.direction
+        elif solid_type == "CollisionSegment":
+            solid_info["point_a"] = solid.point_a
+            solid_info["point_b"] = solid.point_b
+        elif solid_type == "CollisionRay":
+            solid_info["origin"] = solid.origin
+            solid_info["direction"] = solid.direction
+        #elif solid_type == "Parabola":
+        elif solid_type == "CollisionInvSphere":
+            solid_info["center"] = solid.center
+            solid_info["radius"] = solid.radius
+        else:
+            logging.warning(f"Unsupported collision solid type {solid_type}.")
+            return
+        if solid_type == "CollisionPlane":
+            # BUG https://github.com/panda3d/panda3d/issues/1248
+            obj.set_tag("collision_solid_info", str(solid_info).replace(" ", ", ").replace(":,", ":"))
+        else:
+            obj.set_tag("collision_solid_info", str(solid_info))
+
     def add_light(self, light_type, light_info):
         light_model_np = None
         light_np = None
@@ -286,6 +331,28 @@ class Core(TransformationHandler, SelectionHandler):
         base.messenger.send("update_structure")
         return light_model_np
 
+    def add_camera(self, cam_type, cam_info):
+        model = loader.loadModel("models/misc/camera")
+        model.set_tag("object_type", "camera")
+        model.set_tag("scene_object_id", str(uuid4()))
+
+        node = self.create_lens_geom(PerspectiveLens())
+        model.attach_new_node(node)
+
+        model.reparent_to(self.scene_model_parent)
+        self.scene_objects.append(model)
+
+        base.messenger.send("addToKillRing",
+            [model, "add", "camera", None, None])
+
+        base.messenger.send("update_structure")
+        return model
+
+    def create_lens_geom(self, cam_lens):
+        node = GeomNode("cam_lense_display_node")
+        node.addGeom(cam_lens.makeGeometry())
+        return node
+
     def move_element_in_structure(self, direction=1, objects=None):
         if objects is None:
             objects = self.selected_objects
@@ -297,6 +364,21 @@ class Core(TransformationHandler, SelectionHandler):
             obj.reparentTo(parent, newSort)
 
         base.messenger.send("update_structure")
+
+    def add_shader(self, shader_details):
+        for obj in self.selected_objects:
+            shader = Shader.load(
+                shader_details.shader_language,
+                vertex=shader_details.vertex_path,
+                fragment=shader_details.fragment_path,
+                geometry=shader_details.geometry_path,
+                tess_control=shader_details.tessellation_ctrl_path,
+                tess_evaluation=shader_details.tessellation_eval_path)
+
+            for name, value in shader_details.input_dict.items():
+                print(f"INPUT {name} = {value}")
+                obj.set_shader_input(name, value)
+            obj.setShader(shader)
 
     #
     # COLLISION HANDLING

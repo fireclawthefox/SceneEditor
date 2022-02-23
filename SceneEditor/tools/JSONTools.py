@@ -39,6 +39,7 @@ class JSONTools:
                 "scale":str(scene_object.get_scale()),
                 "parent":scene_object.parent.get_name(),
                 "filepath":scene_object.get_tag("filepath"),
+                "transparency":str(scene_object.get_transparency()),
             }
         elif object_type == "empty":
             return {
@@ -66,4 +67,13 @@ class JSONTools:
                 "scale":str(scene_object.get_scale()),
                 "parent":scene_object.parent.get_name(),
                 "light_type":scene_object.get_tag("light_type"),
+            }
+        elif object_type == "camera":
+            return {
+                "object_type":object_type,
+                "pos":str(scene_object.get_pos()),
+                "hpr":str(scene_object.get_hpr()),
+                "scale":str(scene_object.get_scale()),
+                "parent":scene_object.parent.get_name(),
+                "camera_type":scene_object.get_tag("camera_type"),
             }

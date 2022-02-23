@@ -52,7 +52,7 @@ class SceneEditor(ShowBase):
 
         self.core = Core()
         self.camcontroller = CameraController()
-        self.mainView = MainView(self.tt, self.core.grid)
+        self.mainView = MainView(self.tt, self.core.grid, self.core)
 
         base.cTrav = CollisionTraverser("base traverser")
 
@@ -76,29 +76,18 @@ class SceneEditor(ShowBase):
         self.lastFileNameWOExtension = "scene"
 
         # PICKING
-        self.accept("mouse1", self.core.handle_pick, [False])
-        self.accept("shift-mouse1", self.core.handle_pick, [True])
-        self.accept("mouse3", self.core.deselect_all)
         self.accept("pickObject", self.core.select)
 
         # OBJECT EDITING
         self.accept("start_moving", self.start_moving)
 
-        # CAM HANDLING
-        self.accept("mouse2", self.camcontroller.setMoveCamera, [True])
-        self.accept("mouse2-up", self.camcontroller.setMoveCamera, [False])
-        self.accept("shift", self.camcontroller.setMovePivot, [True])
-        self.accept("shift-up", self.camcontroller.setMovePivot, [False])
-        self.accept("shift-mouse2", self.camcontroller.setMoveCamera, [True])
-        self.accept("shift-mouse2-up", self.camcontroller.setMoveCamera, [False])
-        self.accept("wheel_up", self.camcontroller.zoom, [True])
-        self.accept("wheel_down", self.camcontroller.zoom, [False])
-
         # CORE EVENTS
         self.accept("setDirtyFlag", self.set_dirty)
         self.accept("clearDirtyFlag", self.set_clean)
 
+        #
         # UI EVENTS
+        #
 
         # MENU- AND TOOLBAR
         self.accept("newProject", self.core.new_project)
@@ -125,6 +114,8 @@ class SceneEditor(ShowBase):
         self.accept("addEmpty", self.core.add_empty)
         self.accept("addCollision", self.core.add_collision_solid)
         self.accept("addLight", self.core.add_light)
+        self.accept("addCamera", self.core.add_camera)
+        self.accept("addShader", self.core.add_shader)
 
         self.accept("update_structure", self.update_structure_panel)
         base.accept("update_properties", self.update_properties_panel)
@@ -137,12 +128,29 @@ class SceneEditor(ShowBase):
 
         self.accept("3d_display_region_changed", self.core.update_selection_mouse_watcher)
 
-        self.accept("unregisterKeyboardEvents", self.ignore_keyboard_events)
-        self.accept("reregisterKeyboardEvents", self.register_keyboard_events)
-        self.register_keyboard_events()
+        self.accept("unregisterKeyboardEvents", self.ignore_keyboard_and_mouse_events)
+        self.accept("reregisterKeyboardEvents", self.register_keyboard_and_mouse_events)
+        self.register_keyboard_and_mouse_events()
 
-    def register_keyboard_events(self):
+    def register_keyboard_and_mouse_events(self):
         self.keyEvents = {
+
+            # CAM MOUSE HANDLING
+            "mouse2": [self.camcontroller.setMoveCamera, [True]],
+            "mouse2-up": [self.camcontroller.setMoveCamera, [False]],
+            "shift": [self.camcontroller.setMovePivot, [True]],
+            "shift-up": [self.camcontroller.setMovePivot, [False]],
+            "shift-mouse2": [self.camcontroller.setMoveCamera, [True]],
+            "shift-mouse2-up": [self.camcontroller.setMoveCamera, [False]],
+            "wheel_up": [self.camcontroller.zoom, [True]],
+            "wheel_down": [self.camcontroller.zoom, [False]],
+
+            # MOUSE PICKING
+            "mouse1": [self.core.handle_pick, [False]],
+            "shift-mouse1": [self.core.handle_pick, [True]],
+            "mouse3": [self.core.deselect_all],
+
+            # PROJECT HANDLING
             "control-n": [self.new],
             "control-s": [self.save],
             "control-e": [self.export],
@@ -150,6 +158,10 @@ class SceneEditor(ShowBase):
             "control-g": [self.mainView.tool_bar.cb_grid.commandFunc, [None]],
             "control-q": [self.quit_app],
 
+            # LOAD HANDLING
+            "shift-control-s": [self.mainView.show_load_shader_dialog],
+
+            # CAM KEYBOARD
             "+": [self.camcontroller.zoom, [True]],
             "-": [self.camcontroller.zoom, [False]],
             "control-0": [self.camcontroller.resetPivotDefault],
@@ -161,6 +173,7 @@ class SceneEditor(ShowBase):
             "control-7": [self.camcontroller.setPivotBottom],
             "5": [self.camcontroller.toggle_lense],
 
+            # EDITING
             "c": [self.core.toggle_collision_visualization],
             "g": [self.start_moving],
             "r": [self.start_rotating],
@@ -168,15 +181,18 @@ class SceneEditor(ShowBase):
             "delete": [self.core.remove],
             "h": [self.core.toggle_visibility],
 
+            # KILL RING
             "control-c": [self.core.copy_elements],
             "control-x": [self.core.cut_elements],
             "control-v": [self.core.paste_elements],
-
-            #"f1": [self.showHelp],
             "control-z": [self.core.undo],
             "control-y": [self.core.redo],
             "shift-control-y": [self.core.cycleKillRing],
 
+            # HELP
+            #"f1": [self.showHelp],
+
+            # SCENE GRAPH STRUCTURE
             "page_up": [self.core.move_element_in_structure, [1]],
             "page_down": [self.core.move_element_in_structure, [-1]],
         }
@@ -187,7 +203,7 @@ class SceneEditor(ShowBase):
             else:
                 self.accept(event, actionSet[0])
 
-    def ignore_keyboard_events(self):
+    def ignore_keyboard_and_mouse_events(self):
         for event, actionSet in self.keyEvents.items():
             self.ignore(event)
 
@@ -215,11 +231,7 @@ class SceneEditor(ShowBase):
 
     def start_moving(self):
         if not self.core.has_objects_selected(): return
-        self.ignore("mouse1")
-        self.ignore("shift-mouse1")
-        self.ignore("mouse3")
-
-        self.ignore_keyboard_events()
+        self.ignore_keyboard_and_mouse_events()
 
         self.accept("mouse1", self.stop_moving)
         self.accept("mouse3", self.stop_moving, [True])
@@ -242,7 +254,7 @@ class SceneEditor(ShowBase):
         self.accept("shift-mouse1", self.core.handle_pick, [True])
         self.accept("mouse3", self.core.deselect_all)
 
-        self.register_keyboard_events()
+        self.register_keyboard_and_mouse_events()
 
         if not cancel:
             self.core.stop_move_objects()
@@ -251,11 +263,7 @@ class SceneEditor(ShowBase):
 
     def start_rotating(self):
         if not self.core.has_objects_selected(): return
-        self.ignore("mouse1")
-        self.ignore("shift-mouse1")
-        self.ignore("mouse3")
-
-        self.ignore_keyboard_events()
+        self.ignore_keyboard_and_mouse_events()
 
         self.accept("mouse1", self.stop_rotating)
         self.accept("mouse3", self.stop_rotating, [True])
@@ -278,7 +286,7 @@ class SceneEditor(ShowBase):
         self.accept("shift-mouse1", self.core.handle_pick, [True])
         self.accept("mouse3", self.core.deselect_all)
 
-        self.register_keyboard_events()
+        self.register_keyboard_and_mouse_events()
 
         if not cancel:
             self.core.stop_rotate_objects()
@@ -287,11 +295,7 @@ class SceneEditor(ShowBase):
 
     def start_scaling(self):
         if not self.core.has_objects_selected(): return
-        self.ignore("mouse1")
-        self.ignore("shift-mouse1")
-        self.ignore("mouse3")
-
-        self.ignore_keyboard_events()
+        self.ignore_keyboard_and_mouse_events()
 
         self.accept("mouse1", self.stop_scaling)
         self.accept("mouse3", self.stop_scaling, [True])
@@ -314,7 +318,7 @@ class SceneEditor(ShowBase):
         self.accept("shift-mouse1", self.core.handle_pick, [True])
         self.accept("mouse3", self.core.deselect_all)
 
-        self.register_keyboard_events()
+        self.register_keyboard_and_mouse_events()
 
         if not cancel:
             self.core.stop_scale_objects()

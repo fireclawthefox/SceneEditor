@@ -119,6 +119,9 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n"
                         self.content += " "*8 + f"{root_name}.setLight(self.{obj_name})\n\n"
 
+                    elif obj.get_tag("object_type") == "cmaera":
+                        self.content += " "*8 + f"self.{obj_name} = camera('{obj_name}', {obj.get_tag('camera_type')}())\n"
+
                 self.write_scene_element(obj, obj.get_name())
 
     def get_save_object_name(self, name):

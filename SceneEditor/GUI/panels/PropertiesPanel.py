@@ -59,15 +59,30 @@ class PropertyHelper:
             return value
 
     def getValues(definition, obj):
+        editObj = obj
+        if definition.lookupAttrs is not None:
+            for lookupAttr, lookupAttrArgs in definition.lookupAttrs.items():
+                editObj = getattr(editObj, lookupAttr)(*lookupAttrArgs)
+        if definition.setAsTag:
+            return editObj.get_tag(definition.internalName)
         if definition.getFunctionName:
-            return getattr(obj, definition.getFunctionName)()
-        return getattr(obj, definition.internalName)
+            return getattr(editObj, definition.getFunctionName)()
+        return getattr(editObj, definition.internalName)
 
     def setValue(definition, obj, value, valueAsString=""):
+        editObj = obj
+        if definition.lookupAttrs is not None:
+            for lookupAttr, lookupAttrArgs in definition.lookupAttrs.items():
+                editObj = getattr(editObj, lookupAttr)(*lookupAttrArgs)
         if definition.setFunctionName:
-            getattr(obj, definition.setFunctionName)(value)
+            print(editObj)
+            #HOW AM I SUPPOSED TO SET VALUES OF NODES?
+            #obj.node().get_solid(0).radius = value
+            getattr(editObj, definition.setFunctionName)(value)
+        elif definition.setAsTag:
+            editObj.set_tag(definition.internalName, value)
         else:
-            getattr(obj, definition.internalName)
+            setattr(editObj, definition.internalName, value)
 
 
 class PropertiesPanel(DirectObject):
@@ -189,9 +204,9 @@ class PropertiesPanel(DirectObject):
                 object_type = obj.get_tag("object_type")
 
                 if object_type == "light":
-                    object_type += f"_{obj.get_tag('light_type')}"
+                    object_type = obj.get_tag('light_type')
                 elif object_type == "collision":
-                    object_type += f"_{obj.get_tag('collision_solid_type')}"
+                    object_type = obj.get_tag('collision_solid_type')
 
                 # check if we have a definition for this specific GUI element
                 if object_type in allDefinitions:
