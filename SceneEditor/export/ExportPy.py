@@ -46,6 +46,7 @@ class ExporterPy:
             "DirectionalLight",
             "AmbientLight",
             "Spotlight",
+            "Camera",
             "PerspectiveLens"]
 
         self.content += "from panda3d.core import (\n"
@@ -119,8 +120,8 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n"
                         self.content += " "*8 + f"{root_name}.setLight(self.{obj_name})\n\n"
 
-                    elif obj.get_tag("object_type") == "cmaera":
-                        self.content += " "*8 + f"self.{obj_name} = camera('{obj_name}', {obj.get_tag('camera_type')}())\n"
+                    elif obj.get_tag("object_type") == "camera":
+                        self.content += " "*8 + f"self.{obj_name} = Camera('{obj_name}', {obj.get_tag('camera_type')}())\n\n"
 
                 self.write_scene_element(obj, obj.get_name())
 
