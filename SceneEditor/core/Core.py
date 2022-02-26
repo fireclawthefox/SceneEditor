@@ -335,6 +335,7 @@ class Core(TransformationHandler, SelectionHandler):
         model = loader.loadModel("models/misc/camera")
         model.set_tag("object_type", "camera")
         model.set_tag("scene_object_id", str(uuid4()))
+        model.set_tag("camera_type", "PerspectiveLens")
 
         node = self.create_lens_geom(PerspectiveLens())
         model.attach_new_node(node)
@@ -385,19 +386,23 @@ class Core(TransformationHandler, SelectionHandler):
     #
     def toggle_collision_visualization(self):
         if self.show_collisions:
-            print("HIDE COLLISIONS")
             base.cTrav.hide_collisions()
             for obj in self.scene_objects:
-                collisionNodes = obj.find_all_matches("**/+CollisionNode")
-                for collisionNode in collisionNodes:
-                    collisionNode.hide()
+                if obj.get_tag("object_type") == "collision":
+                    obj.hide()
+                else:
+                    collisionNodes = obj.find_all_matches("**/+CollisionNode")
+                    for collisionNode in collisionNodes:
+                        collisionNode.hide()
         else:
-            print("SHOW COLLISIONS")
             base.cTrav.show_collisions(render)
             for obj in self.scene_objects:
-                collisionNodes = obj.find_all_matches("**/+CollisionNode")
-                for collisionNode in collisionNodes:
-                    collisionNode.show()
+                if obj.get_tag("object_type") == "collision":
+                    obj.show()
+                else:
+                    collisionNodes = obj.find_all_matches("**/+CollisionNode")
+                    for collisionNode in collisionNodes:
+                        collisionNode.show()
 
         self.show_collisions = not self.show_collisions
         base.messenger.send("update_structure")
