@@ -8,6 +8,7 @@ from SceneEditor.core.CameraController import CameraController
 from SceneEditor.core.Core import Core
 from SceneEditor.export.ExportPy import ExporterPy
 from SceneEditor.export.ExportProject import ExporterProject
+from SceneEditor.export.ExportBam import ExporterBam
 from SceneEditor.loader.LoadProject import ProjectLoader
 from SceneEditor.GUI.MainView import MainView
 
@@ -61,80 +62,14 @@ class SceneEditor(ShowBase):
         self.dlg_quit = None
         self.dlg_new_project = None
 
-        self.enable_events()
+        self.move_object = False
+        self.rotate_object = False
+        self.scale_object = False
+        self.mouse_events_disabled = False
+        self.keyboard_events_disabled = False
 
-        base.taskMgr.step()
-        base.taskMgr.do_method_later(0, self.mainView.update_3d_display_region, "delayed_display_region_update", extraArgs=[])
-
-    def enable_events(self):
-        self.accept("escape", self.inteligentEscape)
-
-        # SAVING/LOADING
-        self.accept("setLastPath", self.setLastPath)
-
-        self.lastDirPath = ConfigVariableString("work-dir-path", "~").getValue()
-        self.lastFileNameWOExtension = "scene"
-
-        # PICKING
-        self.accept("pickObject", self.core.select)
-
-        # OBJECT EDITING
-        self.accept("start_moving", self.start_moving)
-
-        # CORE EVENTS
-        self.accept("setDirtyFlag", self.set_dirty)
-        self.accept("clearDirtyFlag", self.set_clean)
-
-        #
-        # UI EVENTS
-        #
-
-        # MENU- AND TOOLBAR
-        self.accept("newProject", self.core.new_project)
-        self.accept("loadProject", self.load)
-        self.accept("saveProject", self.save)
-        self.accept("exportProject", self.export)
-        self.accept("loadModel", self.load_model_browser)
-        self.accept("loadPanda", self.core.load_model, ["models/panda"])
-        self.accept("quit_app", self.quit_app)
-        self.accept("toggleGrid", self.core.toggle_grid)
-        self.accept("zoom-in", self.camcontroller.zoom, [True])
-        self.accept("zoom-out", self.camcontroller.zoom, [False])
-        self.accept("zoom-reset", self.camcontroller.reset_zoom)
-        self.accept("undo", self.core.undo)
-        self.accept("redo", self.core.redo)
-        self.accept("cycleRedo", self.core.cycleKillRing)
-        self.accept("addToKillRing", self.core.addToKillRing)
-        self.accept("removeObject", self.core.remove)
-        self.accept("copyElement", self.core.copy_elements)
-        self.accept("cutElement", self.core.cut_elements)
-        self.accept("pasteElement", self.core.paste_elements)
-        #self.accept("showSettings"
-        #self.accept("showHelp"
-        self.accept("addEmpty", self.core.add_empty)
-        self.accept("addCollision", self.core.add_collision_solid)
-        self.accept("addLight", self.core.add_light)
-        self.accept("addCamera", self.core.add_camera)
-        self.accept("addShader", self.core.add_shader)
-
-        self.accept("update_structure", self.update_structure_panel)
-        base.accept("update_properties", self.update_properties_panel)
-
-        # UI ELEMENT EDITING
-        self.accept("toggleElementVisibility", self.core.toggle_visibility)
-        self.accept("removeElement", self.core.remove)
-        self.accept("selectElement", self.core.select)
-        self.accept("moveElementInStructure", self.core.move_element_in_structure)
-
-        self.accept("3d_display_region_changed", self.core.update_selection_mouse_watcher)
-
-        self.accept("unregisterKeyboardEvents", self.ignore_keyboard_and_mouse_events)
-        self.accept("reregisterKeyboardEvents", self.register_keyboard_and_mouse_events)
-        self.register_keyboard_and_mouse_events()
-
-    def register_keyboard_and_mouse_events(self):
-        self.keyEvents = {
-
+        # Event actions
+        self.mouseEvents = {
             # CAM MOUSE HANDLING
             "mouse2": [self.camcontroller.setMoveCamera, [True]],
             "mouse2-up": [self.camcontroller.setMoveCamera, [False]],
@@ -149,17 +84,20 @@ class SceneEditor(ShowBase):
             "mouse1": [self.core.handle_pick, [False]],
             "shift-mouse1": [self.core.handle_pick, [True]],
             "mouse3": [self.core.deselect_all],
+        }
 
+        self.keyboard_events = {
             # PROJECT HANDLING
             "control-n": [self.new],
             "control-s": [self.save],
-            "control-e": [self.export],
+            "control-e": [self.export_python],
             "control-o": [self.load],
             "control-g": [self.mainView.tool_bar.cb_grid.commandFunc, [None]],
             "control-q": [self.quit_app],
 
             # LOAD HANDLING
             "shift-control-s": [self.mainView.show_load_shader_dialog],
+            #"shift-control-s": [self.mainView.show_load_shader_dialog],
 
             # CAM KEYBOARD
             "+": [self.camcontroller.zoom, [True]],
@@ -197,21 +135,136 @@ class SceneEditor(ShowBase):
             "page_down": [self.core.move_element_in_structure, [-1]],
         }
 
-        for event, actionSet in self.keyEvents.items():
-            if len(actionSet) == 2:
-                self.accept(event, actionSet[0], extraArgs=actionSet[1])
-            else:
-                self.accept(event, actionSet[0])
+        self.enable_events()
+
+        base.taskMgr.step()
+        base.taskMgr.do_method_later(0, self.mainView.update_3d_display_region, "delayed_display_region_update", extraArgs=[])
+
+    def enable_events(self):
+        self.accept("escape", self.inteligentEscape)
+
+        # SAVING/LOADING
+        self.accept("setLastPath", self.setLastPath)
+
+        self.lastDirPath = ConfigVariableString("work-dir-path", "~").getValue()
+        self.lastFileNameWOExtension = "scene"
+
+        # PICKING
+        self.accept("pickObject", self.core.select)
+
+        # OBJECT EDITING
+        self.accept("start_moving", self.start_moving)
+
+        # CORE EVENTS
+        self.accept("setDirtyFlag", self.set_dirty)
+        self.accept("clearDirtyFlag", self.set_clean)
+
+        #
+        # UI EVENTS
+        #
+
+        # MENU- AND TOOLBAR
+        self.accept("newProject", self.new)
+        self.accept("loadProject", self.load)
+        self.accept("saveProject", self.save)
+        self.accept("exportProject_python", self.export_python)
+        self.accept("exportProject_bam", self.export_bam)
+        self.accept("loadModel", self.load_model_browser)
+        self.accept("loadPanda", self.core.load_model, ["models/panda"])
+        self.accept("quit_app", self.quit_app)
+        self.accept("toggleGrid", self.core.toggle_grid)
+        self.accept("zoom-in", self.camcontroller.zoom, [True])
+        self.accept("zoom-out", self.camcontroller.zoom, [False])
+        self.accept("zoom-reset", self.camcontroller.reset_zoom)
+        self.accept("undo", self.core.undo)
+        self.accept("redo", self.core.redo)
+        self.accept("cycleRedo", self.core.cycleKillRing)
+        self.accept("addToKillRing", self.core.addToKillRing)
+        self.accept("removeObject", self.core.remove)
+        self.accept("copyElement", self.core.copy_elements)
+        self.accept("cutElement", self.core.cut_elements)
+        self.accept("pasteElement", self.core.paste_elements)
+        #self.accept("showSettings"
+        #self.accept("showHelp"
+        self.accept("addEmpty", self.core.add_empty)
+        self.accept("addCollision", self.core.add_collision_solid)
+        self.accept("addLight", self.core.add_light)
+        self.accept("addCamera", self.core.add_camera)
+        self.accept("addShader", self.core.add_shader)
+
+        self.accept("update_structure", self.update_structure_panel)
+        base.accept("update_properties", self.update_properties_panel)
+
+        # UI ELEMENT EDITING
+        self.accept("toggleElementVisibility", self.core.toggle_visibility)
+        self.accept("removeElement", self.core.remove)
+        self.accept("selectElement", self.core.select)
+        self.accept("moveElementInStructure", self.core.move_element_in_structure)
+
+        self.accept("3d_display_region_changed", self.core.update_selection_mouse_watcher)
+
+        self.accept("unregisterKeyboardEvents", self.ignore_keyboard_events)
+        self.accept("reregisterKeyboardEvents", self.register_keyboard_events)
+
+        self.accept("unregisterMouseEvents", self.ignore_mouse_events)
+        self.accept("reregisterMouseEvents", self.register_mouse_events)
+
+        self.accept("unregisterKeyboardAndMouseEvents", self.ignore_keyboard_and_mouse_events)
+        self.accept("reregisterKeyboardAndMouseEvents", self.register_keyboard_and_mouse_events)
+        self.register_keyboard_and_mouse_events()
+
+    def register_keyboard_and_mouse_events(self):
+        self.register_mouse_events()
+        self.register_keyboard_events()
+
+    def register_mouse_events(self):
+        for event, action_set in self.mouseEvents.items():
+            self.__register_events(event, action_set)
+        self.mouse_events_disabled = False
+
+    def register_keyboard_events(self):
+        for event, action_set in self.keyboard_events.items():
+            self.__register_events(event, action_set)
+        self.keyboard_events_disabled = False
+
+    def __register_events(self, event, action_set):
+        if len(action_set) == 2:
+            self.accept(event, action_set[0], extraArgs=action_set[1])
+        else:
+            self.accept(event, action_set[0])
 
     def ignore_keyboard_and_mouse_events(self):
-        for event, actionSet in self.keyEvents.items():
-            self.ignore(event)
+        self.ignore_mouse_events()
+        self.ignore_keyboard_events()
 
+    def ignore_mouse_events(self):
+        for event, action_set in self.mouseEvents.items():
+            self.ignore(event)
+        self.mouse_events_disabled = True
+
+    def ignore_keyboard_events(self):
+        for event, actionSet in self.keyboard_events.items():
+            self.ignore(event)
+        self.keyboard_events_disabled = True
 
     def inteligentEscape(self):
-        dlg_list = [self.dlg_quit]
+        dlg_list = [self.dlg_quit, self.dlg_new_project]
         if not all(dlg is None for dlg in dlg_list):
             self.opened_dialog_close_functions[-1](None)
+
+        if self.camcontroller.startCameraMovement:
+            self.camcontroller.setMoveCamera(False)
+
+        if self.keyboard_events_disabled:
+            self.register_keyboard_and_mouse_events()
+
+        if self.move_object:
+            self.stop_move_objects()
+        if self.rotate_object:
+            self.stop_rotate_objects()
+        if self.scale_object:
+            self.stop_scale_objects()
+
 
     def set_dirty(self):
         wp = WindowProperties()
@@ -241,6 +294,7 @@ class SceneEditor(ShowBase):
         self.accept("z", self.core.limit_z)
 
         self.core.start_move_objects(self.core.selected_objects)
+        self.move_object = True
 
     def stop_moving(self, cancel=False):
         self.ignore("mouse1")
@@ -260,6 +314,7 @@ class SceneEditor(ShowBase):
             self.core.stop_move_objects()
         else:
             self.core.cancel_move_objects()
+        self.move_object = False
 
     def start_rotating(self):
         if not self.core.has_objects_selected(): return
@@ -273,6 +328,7 @@ class SceneEditor(ShowBase):
         self.accept("z", self.core.limit_z)
 
         self.core.start_rotate_objects(self.core.selected_objects)
+        self.rotate_object = True
 
     def stop_rotating(self, cancel=False):
         self.ignore("mouse1")
@@ -292,6 +348,7 @@ class SceneEditor(ShowBase):
             self.core.stop_rotate_objects()
         else:
             self.core.cancel_rotate_objects()
+        self.rotate_object = False
 
     def start_scaling(self):
         if not self.core.has_objects_selected(): return
@@ -305,6 +362,7 @@ class SceneEditor(ShowBase):
         self.accept("z", self.core.limit_z)
 
         self.core.start_scale_objects(self.core.selected_objects)
+        self.scale_object = True
 
     def stop_scaling(self, cancel=False):
         self.ignore("mouse1")
@@ -324,6 +382,7 @@ class SceneEditor(ShowBase):
             self.core.stop_scale_objects()
         else:
             self.core.cancel_scale_objects()
+        self.scale_object = False
 
     def load_model_browser(self):
         self.browser = DirectFolderBrowser(
@@ -369,6 +428,7 @@ class SceneEditor(ShowBase):
                 frameSize=self.dlg_new_project.bounds,
                 scale=300,
                 parent=base.pixel2d)
+            self.opened_dialog_close_functions.append(self.__newProject)
             return False
         else:
             self.__newProject(1)
@@ -398,13 +458,22 @@ class SceneEditor(ShowBase):
             self.core.scene_objects,
             tooltip=self.tt)
 
-    def export(self):
+    def export_python(self):
         ExporterPy(
             self.lastDirPath,
             self.lastFileNameWOExtension + ".py",
             self.core.scene_model_parent,
             self.core.scene_objects,
             self.tt)
+
+    def export_bam(self):
+        ExporterBam(
+            self.lastDirPath,
+            self.lastFileNameWOExtension + ".bam",
+            self.core.scene_model_parent,
+            self.core.scene_objects,
+            self.tt)
+
 
     def load(self):
         ProjectLoader(

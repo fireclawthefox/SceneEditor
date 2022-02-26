@@ -31,7 +31,10 @@ class MenuBar(DirectObject):
             DirectMenuSeparator(),
             DirectMenuItemEntry("Open", base.messenger.send, ["loadProject"]),
             DirectMenuItemEntry("Save", base.messenger.send, ["saveProject"]),
-            DirectMenuItemEntry("Export", base.messenger.send, ["exportProject"]),
+            DirectMenuItemSubMenu("Export >", [
+                DirectMenuItemEntry("Python", base.messenger.send, ["exportProject_python"]),
+                DirectMenuItemEntry("Bam", base.messenger.send, ["exportProject_bam"]),
+            ]),
             DirectMenuSeparator(),
             DirectMenuItemEntry("Quit", base.messenger.send, ["quit_app"]),
             ]

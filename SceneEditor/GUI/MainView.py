@@ -161,10 +161,10 @@ class MainView(DirectObject):
             base.getSize()[1] - self.menuBarHeight - self.toolBarHeight)
 
     def show_load_shader_dialog(self):
-        base.messenger.send("unregisterKeyboardEvents")
+        base.messenger.send("unregisterKeyboardAndMouseEvents")
         ShaderLoaderDialogManager(self.close_load_shader_dialog, self.core.scene_objects)
 
     def close_load_shader_dialog(self, accept, shader_details):
-        base.messenger.send("reregisterKeyboardEvents")
+        base.messenger.send("reregisterKeyboardAndMouseEvents")
         if accept:
             base.messenger.send("addShader", [shader_details])

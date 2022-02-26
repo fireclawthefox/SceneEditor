@@ -73,7 +73,7 @@ class ToolBar(DirectObject):
             text_scale=0.33,
             relief=DGG.FLAT,
             command=base.messenger.send,
-            extraArgs=["exportProject"],
+            extraArgs=["exportProject_python"],
             image="icons/Export.png",
             image_scale=24)
         btn.setTransparency(TransparencyAttrib.M_multisample)
