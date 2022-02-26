@@ -113,6 +113,8 @@ DEFAULT_DEFINITIONS = [
 ]
 
 COLLISION_LOOKUP_ATTRS={"node":[], "get_solid":[0]}
+LIGHT_LOOKUP_ATTRS={"get_child":[1], "node":[]}
+AMBIENT_LIGHT_LOOKUP_ATTRS={"get_child":[0], "node":[]}
 
 DEFINITIONS = {
     #
@@ -167,10 +169,24 @@ DEFINITIONS = {
     #
     # Light
     #
-    "light_PointLight":DEFAULT_DEFINITIONS + [
-    ]
+    "PointLight":DEFAULT_DEFINITIONS + [
+        Definition('attenuation', 'attenuation', object, editType=t.base3, lookupAttrs=LIGHT_LOOKUP_ATTRS),
+        Definition('color', 'Light Color (R/G/B/A)', object, editType=t.base4, nullable=True, getFunctionName="getColor", setFunctionName="setColor", lookupAttrs=LIGHT_LOOKUP_ATTRS),
+    ],
+    "DirectionalLight":DEFAULT_DEFINITIONS + [
+        Definition('color', 'Light Color (R/G/B/A)', object, editType=t.base4, nullable=True, getFunctionName="getColor", setFunctionName="setColor", lookupAttrs=LIGHT_LOOKUP_ATTRS),
+    ],
+    "AmbientLight":DEFAULT_DEFINITIONS + [
+        Definition('color', 'Light Color (R/G/B/A)', object, editType=t.base4, nullable=True, getFunctionName="getColor", setFunctionName="setColor", lookupAttrs=AMBIENT_LIGHT_LOOKUP_ATTRS),
+    ],
+    "Spotlight":DEFAULT_DEFINITIONS + [
+        Definition('color', 'Light Color (R/G/B/A)', object, editType=t.base4, nullable=True, getFunctionName="getColor", setFunctionName="setColor", lookupAttrs=LIGHT_LOOKUP_ATTRS),
+    ],
+
 
     #
     # Camera
     #
+    "camera":DEFAULT_DEFINITIONS + [
+    ],
 }

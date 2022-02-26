@@ -76,8 +76,6 @@ class PropertyHelper:
                 editObj = getattr(editObj, lookupAttr)(*lookupAttrArgs)
         if definition.setFunctionName:
             print(editObj)
-            #HOW AM I SUPPOSED TO SET VALUES OF NODES?
-            #obj.node().get_solid(0).radius = value
             getattr(editObj, definition.setFunctionName)(value)
         elif definition.setAsTag:
             editObj.set_tag(definition.internalName, value)
