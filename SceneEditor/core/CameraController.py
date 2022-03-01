@@ -59,7 +59,7 @@ class CameraController:
             lens = OrthographicLens()
             # TODO: get the aspect according to the display region size
             aspect = base.win.get_size()[0] / base.win.get_size()[1]
-            lens.setFilmSize(self.ortho_zoom_size*aspect, self.ortho_zoom_size)
+            lens.set_film_size(self.ortho_zoom_size*aspect, self.ortho_zoom_size)
             lens.set_near_far(0.001, 1000)
         base.cam.node().set_lens(lens)
         base.camLens = lens
