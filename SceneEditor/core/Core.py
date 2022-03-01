@@ -35,8 +35,11 @@ from panda3d.core import (
     AmbientLight,
     Spotlight,
 
+    # Camera
+    Camera,
     # Lens
     PerspectiveLens,
+    OrthographicLens,
     GeomNode
     )
 
@@ -335,9 +338,26 @@ class Core(TransformationHandler, SelectionHandler):
         model = loader.loadModel("models/misc/camera")
         model.set_tag("object_type", "camera")
         model.set_tag("scene_object_id", str(uuid4()))
-        model.set_tag("camera_type", "PerspectiveLens")
+        model.set_tag("camera_type", cam_type)
 
-        node = self.create_lens_geom(PerspectiveLens())
+        lens = None
+        if cam_type == "Orthographic":
+            lens = OrthographicLens()
+        else:
+            lens = PerspectiveLens()
+
+        i = 1
+        cam_name = f"{cam_type}_camera_{i}"
+        while self.scene_model_parent.find(f"**/{cam_name}"):
+            i += 1
+            cam_name = f"{cam_type}_camera_{i}"
+        model.set_name(cam_name)
+
+        cam = Camera("Camera", lens)
+        model.attach_new_node(cam)
+
+        # create the lens visualization
+        node = self.create_lens_geom(lens)
         model.attach_new_node(node)
 
         model.reparent_to(self.scene_model_parent)

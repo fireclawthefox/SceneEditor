@@ -112,9 +112,28 @@ DEFAULT_DEFINITIONS = [
     Definition('transparency', 'Transparency', str, editType=t.optionMenu, valueOptions={"None":TransparencyAttrib.M_none,"Alpha":TransparencyAttrib.M_alpha,"Premultiplied Alpha":TransparencyAttrib.M_premultiplied_alpha,"Multisample":TransparencyAttrib.M_multisample,"Multisample Mask":TransparencyAttrib.M_multisample_mask,"Binary":TransparencyAttrib.M_binary,"Dual":TransparencyAttrib.M_dual}, getFunctionName="getTransparency", setFunctionName="setTransparency")
 ]
 
+# Lookup definitions for how to get to specific attributes
 COLLISION_LOOKUP_ATTRS={"node":[], "get_solid":[0]}
 LIGHT_LOOKUP_ATTRS={"get_child":[1], "node":[]}
+LIGHT_LENS_LOOKUP_ATTRS={""}
 AMBIENT_LIGHT_LOOKUP_ATTRS={"get_child":[0], "node":[]}
+CAM_LENS_LOOKUP_ATTRS={"get_child":[1], "node":[], "get_lens":[]}
+
+CAM_LENS_DEFAULT_DEFINITIONS = [
+    Definition('aspect_ratio', 'Aspect ratio', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('fov', 'Field of View', object, editType=t.base2, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('film_size', 'film size', object, editType=t.base2, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('film_offset', 'film offset', object, editType=t.base2, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('near', 'Near distance', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('far', 'Far distance', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('focal_length', 'Focal length', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('min_fov', 'Minimum Field of View', object, editType=t.base2, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('view_hpr', 'View HPR', object, editType=t.base3, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    # matrix editing isn't supported yet
+    #Definition('view_mat', 'View Transformation Matrix', object, editType=t.matrix4, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('change_event', 'Lens change event name', str, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+    Definition('keystone', 'Keystone correction', object, editType=t.base2, lookupAttrs=CAM_LENS_LOOKUP_ATTRS)
+]
 
 DEFINITIONS = {
     #
@@ -187,6 +206,9 @@ DEFINITIONS = {
     #
     # Camera
     #
-    "camera":DEFAULT_DEFINITIONS + [
+    "Perspective":DEFAULT_DEFINITIONS + CAM_LENS_DEFAULT_DEFINITIONS + [
+        Definition('convergence_distance', 'Convergence distance', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
+        Definition('interocular_distance', 'Left/Right eye distance', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
     ],
+    "Orthographic":DEFAULT_DEFINITIONS + CAM_LENS_DEFAULT_DEFINITIONS,
 }

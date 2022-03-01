@@ -54,7 +54,11 @@ class PropertyHelper:
         if type(value) is int or isInt:
             return "{}".format(int(value))
         elif type(value) is not str:
-            return "{:0.3f}".format(value)
+            try:
+                return "{:0.3f}".format(value)
+            except:
+                logging.error(f"couldn't convert value of type {type(value)} to float")
+                return None
         else:
             return value
 
@@ -202,9 +206,11 @@ class PropertiesPanel(DirectObject):
                 object_type = obj.get_tag("object_type")
 
                 if object_type == "light":
-                    object_type = obj.get_tag('light_type')
+                    object_type = obj.get_tag("light_type")
                 elif object_type == "collision":
-                    object_type = obj.get_tag('collision_solid_type')
+                    object_type = obj.get_tag("collision_solid_type")
+                elif object_type == "camera":
+                    object_type = obj.get_tag("camera_type")
 
                 # check if we have a definition for this specific GUI element
                 if object_type in allDefinitions:

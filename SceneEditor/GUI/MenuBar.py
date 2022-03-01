@@ -87,7 +87,10 @@ class MenuBar(DirectObject):
                 DirectMenuItemEntry("Directional Light", base.messenger.send, ["addLight", ["DirectionalLight", {}]]),
                 DirectMenuItemEntry("Ambient Light", base.messenger.send, ["addLight", ["AmbientLight", {}]]),
                 ]),
-            DirectMenuItemEntry("Camera", base.messenger.send, ["addCamera", ["Perspective", {}]]),
+            DirectMenuItemSubMenu("Camera >", [
+                DirectMenuItemEntry("Perspective", base.messenger.send, ["addCamera", ["Perspective", {}]]),
+                DirectMenuItemEntry("Orthographic", base.messenger.send, ["addCamera", ["Orthographic", {}]]),
+                ]),
             DirectMenuItemEntry("Shader", base.messenger.send, ["show_load_shader_dialog"]),
         ]
         #TODO: THE COLORS DON'T WORK CORRECT YET
