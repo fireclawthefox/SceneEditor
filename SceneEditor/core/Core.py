@@ -13,6 +13,7 @@ from panda3d.core import (
     Vec4,
     Point3,
     NodePath,
+    DrawMask,
 
     # Shaders
     Shader,
@@ -45,6 +46,8 @@ from panda3d.core import (
 
 class Core(TransformationHandler, SelectionHandler):
     def __init__(self):
+        self.shading_mask = DrawMask(0x0000ffff)
+
         self.killRing = KillRing()
 
         self.scene_objects = []
@@ -57,6 +60,10 @@ class Core(TransformationHandler, SelectionHandler):
         self.dirty = False
 
         self.grid = DirectGrid(gridSize=1000.0, gridSpacing=1, parent=render)
+        # usual scene editor setup
+        self.prepare_for_editor(self.grid)
+        self.grid.flatten_strong()
+        self.grid.set_shader_off(1)
 
         self.scene_root = render.attach_new_node("scene_root")
         self.scene_model_parent = self.scene_root.attach_new_node("scene_model_parent")
@@ -148,6 +155,9 @@ class Core(TransformationHandler, SelectionHandler):
         model.reparent_to(self.scene_model_parent)
         self.scene_objects.append(model)
 
+        # usual scene editor setup
+        self.prepare_for_editor(model)
+
         base.messenger.send("addToKillRing",
             [model, "add", "empty", None, None])
 
@@ -167,7 +177,6 @@ class Core(TransformationHandler, SelectionHandler):
         col_np.set_tag("object_type", "collision")
         col_np.set_tag("collision_solid_type", solid_type)
         col_np.set_tag("scene_object_id", str(uuid4()))
-
 
         if solid_type == "CollisionSphere":
             if solid_info == {}:
@@ -240,6 +249,10 @@ class Core(TransformationHandler, SelectionHandler):
         else:
             col_np.set_tag("collision_solid_info", str(solid_info))
         cn.addSolid(col)
+
+        # usual scene editor setup
+        self.prepare_for_editor(col_np)
+
         self.scene_objects.append(col_np)
 
         base.messenger.send("addToKillRing",
@@ -292,6 +305,7 @@ class Core(TransformationHandler, SelectionHandler):
         light_model_np = None
         light_np = None
         light = None
+        lens_node = None
 
         i = 1
         light_name = f"{light_type}_{i}"
@@ -307,6 +321,11 @@ class Core(TransformationHandler, SelectionHandler):
             light_model_np = loader.loadModel("models/misc/Dirlight")
             light = DirectionalLight('Directional Light')
 
+            light.camera_mask = self.shading_mask
+
+            # create the lens visualization
+            lens_node = self.create_lens_geom(light.get_lens())
+
         elif light_type == "AmbientLight":
             light_model_np = NodePath(light_name)
             light = AmbientLight('Ambient Light')
@@ -314,17 +333,28 @@ class Core(TransformationHandler, SelectionHandler):
         elif light_type == "Spotlight":
             light_model_np = loader.loadModel("models/misc/Spotlight")
             light = Spotlight('Spotlight')
+
             lens = PerspectiveLens()
             light.setLens(lens)
+            light.camera_mask = self.shading_mask
+
+            # create the lens visualization
+            lens_node = self.create_lens_geom(lens)
 
         light_model_np.set_name(light_name)
         light_model_np.set_light_off()
         light_np = light_model_np.attachNewNode(light)
+        if lens_node is not None:
+            lens_np = light_np.attach_new_node(lens_node)
+            lens_np.hide(self.shading_mask)
         light_model_np.set_tag("object_type", "light")
         light_model_np.set_tag("light_type", light_type)
         light_model_np.set_tag("scene_object_id", str(uuid4()))
         light_model_np.reparent_to(self.scene_model_parent)
         self.scene_model_parent.setLight(light_np)
+
+        # usual scene editor setup
+        self.prepare_for_editor(light_model_np)
 
         self.scene_objects.append(light_model_np)
 
@@ -363,6 +393,9 @@ class Core(TransformationHandler, SelectionHandler):
         model.reparent_to(self.scene_model_parent)
         self.scene_objects.append(model)
 
+        # usual scene editor setup
+        self.prepare_for_editor(model)
+
         base.messenger.send("addToKillRing",
             [model, "add", "camera", None, None])
 
@@ -397,9 +430,17 @@ class Core(TransformationHandler, SelectionHandler):
                 tess_evaluation=shader_details.tessellation_eval_path)
 
             for name, value in shader_details.input_dict.items():
-                print(f"INPUT {name} = {value}")
                 obj.set_shader_input(name, value)
             obj.setShader(shader)
+
+    def prepare_for_editor(self, nodepath, cast_shadow=False, disable_lighting=True):
+        if not cast_shadow:
+            # don't cast shadows
+            nodepath.hide(self.shading_mask)
+
+        # disable lighing of this object
+        if disable_lighting:
+            nodepath.set_light_off()
 
     #
     # COLLISION HANDLING
