@@ -79,7 +79,11 @@ class PropertyHelper:
             for lookupAttr, lookupAttrArgs in definition.lookupAttrs.items():
                 editObj = getattr(editObj, lookupAttr)(*lookupAttrArgs)
         if definition.setFunctionName:
-            print(editObj)
+            if definition.type != object:
+                try:
+                    value = definition.type(*value)
+                except:
+                    logging.debug(f"couldn't convert value {value} to type {definition.type}")
             getattr(editObj, definition.setFunctionName)(value)
         elif definition.setAsTag:
             editObj.set_tag(definition.internalName, value)
@@ -312,11 +316,11 @@ class PropertiesPanel(DirectObject):
         elif definition.editType == ObjectPropertiesDefinition.PropertyEditTypes.text:
             self.__createTextProperty(definition, obj)
         elif definition.editType == ObjectPropertiesDefinition.PropertyEditTypes.base2:
-            self.__createBaseNInput(definition, obj, 2)
+            self.__createBaseNInput(definition, obj, 2, definition.numberType)
         elif definition.editType == ObjectPropertiesDefinition.PropertyEditTypes.base3:
-            self.__createBaseNInput(definition, obj, 3)
+            self.__createBaseNInput(definition, obj, 3, definition.numberType)
         elif definition.editType == ObjectPropertiesDefinition.PropertyEditTypes.base4:
-            self.__createBaseNInput(definition, obj, 4)
+            self.__createBaseNInput(definition, obj, 4, definition.numberType)
         elif definition.editType == ObjectPropertiesDefinition.PropertyEditTypes.command:
             self.__createCustomCommand(definition, obj)
         elif definition.editType == ObjectPropertiesDefinition.PropertyEditTypes.path:

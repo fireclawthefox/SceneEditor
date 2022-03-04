@@ -2,6 +2,7 @@ import types
 
 from panda3d.core import PGFrameStyle, TransparencyAttrib
 from direct.gui import DirectGuiGlobals as DGG
+from panda3d.core import LVecBase2i
 
 class PropertyEditTypes:
     integer = "integer"
@@ -25,6 +26,7 @@ class Definition:
             visiblename,
             internalType,
             editType=None,
+            numberType=float,
             nullable=False,
             valueOptions=None,
             getFunctionName=None,
@@ -42,6 +44,11 @@ class Definition:
 
         # Type of this property
         self.type = internalType
+
+        # in case of base* values this type will be used to indicate which type
+        # of numeric we're working with. Currently this should either be int or
+        # float
+        self.numberType = numberType
 
         # defines if the value of this property may be None
         self.nullable = nullable
@@ -115,7 +122,7 @@ DEFAULT_DEFINITIONS = [
 # Lookup definitions for how to get to specific attributes
 COLLISION_LOOKUP_ATTRS={"node":[], "get_solid":[0]}
 LIGHT_LOOKUP_ATTRS={"get_child":[1], "node":[]}
-LIGHT_LENS_LOOKUP_ATTRS={""}
+LIGHT_LENS_LOOKUP_ATTRS={"get_child":[1], "node":[], "get_lens":[]}
 AMBIENT_LIGHT_LOOKUP_ATTRS={"get_child":[0], "node":[]}
 CAM_LENS_LOOKUP_ATTRS={"get_child":[1], "node":[], "get_lens":[]}
 
@@ -133,6 +140,22 @@ CAM_LENS_DEFAULT_DEFINITIONS = [
     #Definition('view_mat', 'View Transformation Matrix', object, editType=t.matrix4, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
     Definition('change_event', 'Lens change event name', str, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
     Definition('keystone', 'Keystone correction', object, editType=t.base2, lookupAttrs=CAM_LENS_LOOKUP_ATTRS)
+]
+
+LIGHTt_LENS_DEFAULT_DEFINITIONS = [
+    Definition('aspect_ratio', 'Aspect ratio', float, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('fov', 'Field of View', object, editType=t.base2, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('film_size', 'film size', object, editType=t.base2, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('film_offset', 'film offset', object, editType=t.base2, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('near', 'Near distance', float, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('far', 'Far distance', float, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('focal_length', 'Focal length', float, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('min_fov', 'Minimum Field of View', object, editType=t.base2, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('view_hpr', 'View HPR', object, editType=t.base3, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    # matrix editing isn't supported yet
+    #Definition('view_mat', 'View Transformation Matrix', object, editType=t.matrix4, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('change_event', 'Lens change event name', str, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS),
+    Definition('keystone', 'Keystone correction', object, editType=t.base2, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS)
 ]
 
 DEFINITIONS = {
@@ -194,14 +217,17 @@ DEFINITIONS = {
     ],
     "DirectionalLight":DEFAULT_DEFINITIONS + [
         Definition('color', 'Light Color (R/G/B/A)', object, editType=t.base4, nullable=True, getFunctionName="getColor", setFunctionName="setColor", lookupAttrs=LIGHT_LOOKUP_ATTRS),
-    ],
+        Definition('shadow_caster', 'Shadow caster', bool, setFunctionName="setShadowCaster", lookupAttrs=LIGHT_LOOKUP_ATTRS),
+        Definition('shadow_buffer_size', 'Shadow buffer size', LVecBase2i, editType=t.base2, setFunctionName="setShadowBufferSize", lookupAttrs=LIGHT_LOOKUP_ATTRS, numberType=int),
+    ] + LIGHTt_LENS_DEFAULT_DEFINITIONS,
     "AmbientLight":DEFAULT_DEFINITIONS + [
         Definition('color', 'Light Color (R/G/B/A)', object, editType=t.base4, nullable=True, getFunctionName="getColor", setFunctionName="setColor", lookupAttrs=AMBIENT_LIGHT_LOOKUP_ATTRS),
     ],
     "Spotlight":DEFAULT_DEFINITIONS + [
         Definition('color', 'Light Color (R/G/B/A)', object, editType=t.base4, nullable=True, getFunctionName="getColor", setFunctionName="setColor", lookupAttrs=LIGHT_LOOKUP_ATTRS),
-    ],
-
+        Definition('shadow_caster', 'Shadow caster', bool, setFunctionName="setShadowCaster", lookupAttrs=LIGHT_LOOKUP_ATTRS),
+        Definition('shadow_buffer_size', 'Shadow buffer size', LVecBase2i, editType=t.base2, setFunctionName="setShadowBufferSize", lookupAttrs=LIGHT_LOOKUP_ATTRS, numberType=int),
+    ] + LIGHTt_LENS_DEFAULT_DEFINITIONS,
 
     #
     # Camera
