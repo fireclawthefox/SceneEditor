@@ -19,14 +19,14 @@
     - Can we get solid details from the col_np.node()?
   - [X] Load solids
   - [X] Export solids
-* TODO Camera editing [0%]
-  - [ ] Add camera
-  - [ ] Edit camera properties
+* DONE Camera editing [100%]
+  - [X] Add camera
+  - [X] Edit camera properties
     - Name
     - Lense properties
-* TODO Scene lighting [50%]
+* DONE Scene lighting [100%]
   - [X] Add lamps
-  - [ ] Edit lamp properties
+  - [X] Edit lamp properties
     - name
     - color
     - type
@@ -39,19 +39,20 @@
   - [ ] Help Dialog
   - [ ] Configuration Dialog
   - [ ] Asset browser
-* DONE Physics [100%]
+* TODO Physics [50%]
   - [X] Can we add force fields or the like with the internal engine?
     We may want to make nodes physically interactive, which would require simply reparent them to an ActorNode in the end.
+  - [ ] Implementation
 * DONE Exporting [100%]
   - [X] Export all objects and settings as python class
     - Make sure they can be directly used and don't do too much (similar to exported GUI python script)
   - [X] Export as project JSON
-* TODO Extended features [7%]
+* TODO Extended features [14%]
   - [ ] Nicer highlighting/outlining of selected models
   - [ ] Texture and Material editing
-  - [ ] adding shaders to objects
+  - [X] adding shaders to objects
   - [ ] Make objects placeable on other objects (taking normals) and optionally rotate to fit normals of hit objects
-  - [ ] Edit Render attributes of objects (e.g. bilboard, compass, etc...)
+  - [ ] Add Render attributes (e.g. bilboard, compass, etc...)
   - [X] Make sure the 3D space is not occupied by other panels e.g. it scales and is centered between other panels
   - [ ] Memory viewer (how does the direct session panel does it?)
   - [ ] Curve and Mopath editing
@@ -59,5 +60,4 @@
   - [ ] Heightmap and ground texture painting
   - [ ] LOD node editing
   - [ ] Simple onscreen text adding
-  - [ ] Set render effects (Billboard and compass)
   - [ ] Transform objects with displayed widgets
