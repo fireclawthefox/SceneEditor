@@ -88,8 +88,8 @@ class MenuBar(DirectObject):
                 DirectMenuItemEntry("Ambient Light", base.messenger.send, ["addLight", ["AmbientLight", {}]]),
                 ]),
             DirectMenuItemSubMenu("Camera >", [
-                DirectMenuItemEntry("Perspective", base.messenger.send, ["addCamera", ["Perspective", {}]]),
-                DirectMenuItemEntry("Orthographic", base.messenger.send, ["addCamera", ["Orthographic", {}]]),
+                DirectMenuItemEntry("Perspective", base.messenger.send, ["addCamera", ["PerspectiveLens", {}]]),
+                DirectMenuItemEntry("Orthographic", base.messenger.send, ["addCamera", ["OrthographicLens", {}]]),
                 ]),
             DirectMenuItemEntry("Shader", base.messenger.send, ["show_load_shader_dialog"]),
         ]

@@ -90,6 +90,13 @@ class PropertyHelper:
         else:
             setattr(editObj, definition.internalName, value)
 
+        # store a list of edited properties
+        edit_list = []
+        if obj.has_tag("edited_properties"):
+            edit_list = obj.get_tag("edited_properties").split(",")
+        if definition.internalName not in edit_list:
+            edit_list.append(definition.internalName)
+            obj.set_tag("edited_properties", ",".join(edit_list))
 
 class PropertiesPanel(DirectObject):
     scrollSpeedUp = -0.001

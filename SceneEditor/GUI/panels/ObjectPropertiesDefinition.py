@@ -232,9 +232,9 @@ DEFINITIONS = {
     #
     # Camera
     #
-    "Perspective":DEFAULT_DEFINITIONS + CAM_LENS_DEFAULT_DEFINITIONS + [
+    "PerspectiveLens":DEFAULT_DEFINITIONS + CAM_LENS_DEFAULT_DEFINITIONS + [
         Definition('convergence_distance', 'Convergence distance', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
         Definition('interocular_distance', 'Left/Right eye distance', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
     ],
-    "Orthographic":DEFAULT_DEFINITIONS + CAM_LENS_DEFAULT_DEFINITIONS,
+    "OrthographicLens":DEFAULT_DEFINITIONS + CAM_LENS_DEFAULT_DEFINITIONS,
 }

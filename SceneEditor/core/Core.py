@@ -371,7 +371,7 @@ class Core(TransformationHandler, SelectionHandler):
         model.set_tag("camera_type", cam_type)
 
         lens = None
-        if cam_type == "Orthographic":
+        if cam_type == "OrthographicLens":
             lens = OrthographicLens()
         else:
             lens = PerspectiveLens()
@@ -441,6 +441,37 @@ class Core(TransformationHandler, SelectionHandler):
         # disable lighing of this object
         if disable_lighting:
             nodepath.set_light_off()
+
+    #
+    # OBJECT TAG HANDLING
+    #
+    def set_edited_tag(self, obj, tag):
+        tag_string = ""
+        if obj.has_tag("edited_properties"):
+            tag_string = obj.get_tag("edited_properties")
+
+        tag_values = tag_string.split(",")
+        if tag not in tag_values:
+            tag_values.append(tag)
+            obj.set_tag("edited_properties", ",".join(tag_values))
+
+    def remove_edited_tag(self, obj, tag):
+        tag_string = ""
+        if obj.has_tag("edited_properties"):
+            tag_string = obj.get_tag("edited_properties")
+
+        tag_values = tag_string.split(",")
+        if tag not in tag_values:
+            tag_values.remove(tag)
+            obj.set_tag("edited_properties", tag_values)
+
+    def is_edited_property(self, obj, tag):
+        tag_string = ""
+        if obj.has_tag("edited_properties"):
+            tag_string = obj.get_tag("edited_properties")
+
+        tag_values = tag_string.split(",")
+        return tag in tag_values
 
     #
     # COLLISION HANDLING

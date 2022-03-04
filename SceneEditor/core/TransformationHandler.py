@@ -73,6 +73,8 @@ class TransformationHandler:
         self.limit_line.drawTo(extend_b)
         self.limit_line.create()
 
+        self.prepare_for_editor(self.limit_line)
+
     def clear_limit(self):
         self.limit_line.reset()
         self.limit_line_np.stash()
@@ -158,6 +160,7 @@ class TransformationHandler:
                 self.dirty = True
                 base.messenger.send("setDirtyFlag")
             for obj in t.object_infos.keys():
+                self.set_edited_tag(obj, "pos")
                 base.messenger.send("addToKillRing",
                     [obj, "set", "pos", t.object_infos[obj], obj.get_pos()])
             base.messenger.send("update_properties")
@@ -283,6 +286,7 @@ class TransformationHandler:
                 self.dirty = True
                 base.messenger.send("setDirtyFlag")
             for obj in t.object_infos.keys():
+                self.set_edited_tag(obj, "hpr")
                 base.messenger.send("addToKillRing",
                     [obj, "set", "hpr", t.object_infos[obj][2], obj.get_hpr()])
             base.messenger.send("update_properties")
@@ -396,6 +400,7 @@ class TransformationHandler:
                 self.dirty = True
                 base.messenger.send("setDirtyFlag")
             for obj in t.object_infos.keys():
+                self.set_edited_tag(obj, "scale")
                 base.messenger.send("addToKillRing",
                     [obj, "set", "scale", t.object_infos[obj][0], obj.get_scale()])
             base.messenger.send("update_properties")
