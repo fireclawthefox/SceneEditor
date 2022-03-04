@@ -1,7 +1,8 @@
 import logging
 from uuid import uuid4
 
-from direct.directtools.DirectGrid import DirectGrid
+#from direct.directtools.DirectGrid import DirectGrid
+from directtoolsOverrides.DirectGrid import DirectGrid
 
 from SceneEditor.core.KillRing import KillRing
 from SceneEditor.core.TransformationHandler import TransformationHandler
