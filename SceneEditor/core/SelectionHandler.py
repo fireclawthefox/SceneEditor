@@ -90,6 +90,7 @@ class SelectionHandler:
 
         base.messenger.send("update_structure")
         base.messenger.send("update_properties")
+        base.messenger.send("reregisterKeyboardAndMouseEvents")
 
     def deselect_all(self):
         for obj in self.selected_objects:
@@ -100,6 +101,7 @@ class SelectionHandler:
 
         base.messenger.send("update_structure")
         base.messenger.send("update_properties")
+        base.messenger.send("reregisterKeyboardAndMouseEvents")
 
     def remove(self, objs=None, includeWithKillCycle=True):
         if objs is None:

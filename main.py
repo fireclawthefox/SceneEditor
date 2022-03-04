@@ -2,7 +2,15 @@ import os
 
 from direct.showbase.ShowBase import ShowBase
 
-from panda3d.core import TextNode, CollisionTraverser, loadPrcFileData, WindowProperties, ConfigVariableBool, ConfigVariableString
+from panda3d.core import (
+    TextNode,
+    CollisionTraverser,
+    loadPrcFileData,
+    WindowProperties,
+    ConfigVariableBool,
+    ConfigVariableString,
+    AntialiasAttrib,
+    )
 
 from SceneEditor.core.CameraController import CameraController
 from SceneEditor.core.Core import Core
@@ -65,8 +73,12 @@ class SceneEditor(ShowBase):
         self.move_object = False
         self.rotate_object = False
         self.scale_object = False
-        self.mouse_events_disabled = False
-        self.keyboard_events_disabled = False
+        self.mouse_events_disabled = True
+        self.keyboard_events_disabled = True
+
+
+        self.core.scene_root.set_shader_auto()
+        #self.core.scene_root.setAntialias(AntialiasAttrib.MAuto)
 
         # Event actions
         self.mouseEvents = {
@@ -218,14 +230,16 @@ class SceneEditor(ShowBase):
         self.register_keyboard_events()
 
     def register_mouse_events(self):
-        for event, action_set in self.mouseEvents.items():
-            self.__register_events(event, action_set)
-        self.mouse_events_disabled = False
+        if self.mouse_events_disabled:
+            for event, action_set in self.mouseEvents.items():
+                self.__register_events(event, action_set)
+            self.mouse_events_disabled = False
 
     def register_keyboard_events(self):
-        for event, action_set in self.keyboard_events.items():
-            self.__register_events(event, action_set)
-        self.keyboard_events_disabled = False
+        if self.keyboard_events_disabled:
+            for event, action_set in self.keyboard_events.items():
+                self.__register_events(event, action_set)
+            self.keyboard_events_disabled = False
 
     def __register_events(self, event, action_set):
         if len(action_set) == 2:
@@ -238,14 +252,16 @@ class SceneEditor(ShowBase):
         self.ignore_keyboard_events()
 
     def ignore_mouse_events(self):
-        for event, action_set in self.mouseEvents.items():
-            self.ignore(event)
-        self.mouse_events_disabled = True
+        if not self.mouse_events_disabled:
+            for event, action_set in self.mouseEvents.items():
+                self.ignore(event)
+            self.mouse_events_disabled = True
 
     def ignore_keyboard_events(self):
-        for event, actionSet in self.keyboard_events.items():
-            self.ignore(event)
-        self.keyboard_events_disabled = True
+        if not self.keyboard_events_disabled:
+            for event, actionSet in self.keyboard_events.items():
+                self.ignore(event)
+            self.keyboard_events_disabled = True
 
     def inteligentEscape(self):
         dlg_list = [self.dlg_quit, self.dlg_new_project]
