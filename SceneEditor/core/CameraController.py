@@ -1,3 +1,4 @@
+import math
 from panda3d.core import Point2, Vec3, PerspectiveLens, OrthographicLens
 
 class CameraController:
@@ -34,9 +35,12 @@ class CameraController:
         self.camDistance = 15.0
         # min and maximal distance between player and camera
         self.maxCamDistance = 1000.0
-        self.minCamDistance = 3.0
+        self.minCamDistance = 1.5
         # the speed at which the mousewheel and +/- will zoom the camera in/out
         self.zoomSpeed = 1.0
+        # minumum and maximum zoom speed
+        self.min_zoom_speed = 0.45
+        self.max_zoom_speed = 100
         # the speed at which the mouse moves the camera
         self.mouseSpeed = 50
 
@@ -111,24 +115,55 @@ class CameraController:
     #
     def zoom(self, zoomIn):
         if not self.is_orthographic:
+            # PERSPECTIVE
+
+            # calculate new zoom speed dependent on distance
+            dist_relative = self.camDistance/self.maxCamDistance
+            if dist_relative > 1:
+                dist_relative = 0.9
+            self.zoomSpeed = self.camDistance * math.asin(dist_relative)
+            if self.zoomSpeed < self.min_zoom_speed:
+                self.zoomSpeed = self.min_zoom_speed
+            if self.zoomSpeed > self.max_zoom_speed:
+                self.zoomSpeed = self.max_zoom_speed
+
+            # actual zooming
             if zoomIn:
+                #
+                # ZOOM IN
+                #
                 # check if we are far enough away to further zoom in
                 if self.camDistance > self.minCamDistance:
                     # zoom in by a given speed
                     self.camDistance -= self.zoomSpeed
+                    if self.camDistance < self.minCamDistance:
+                        self.camDistance = self.minCamDistance
             else:
+                #
+                # ZOOM OUT
+                #
                 # check if we are close enough to further zoom out
                 if self.camDistance < self.maxCamDistance:
                     # zoom out by a given speed
                     self.camDistance += self.zoomSpeed
+                    if self.camDistance > self.maxCamDistance:
+                        self.camDistance = self.maxCamDistance
         else:
+            # ORTHOGRAPHIC
+
             aspect = base.win.get_size()[0] / base.win.get_size()[1]
 
             if zoomIn:
+                #
+                # ZOOM IN
+                #
                 self.ortho_zoom_size -= 1
                 if self.ortho_zoom_size < self.min_ortho_zoom_size:
                     self.ortho_zoom_size = self.min_ortho_zoom_size
             else:
+                #
+                # ZOOM OUT
+                #
                 self.ortho_zoom_size += 1
                 if self.ortho_zoom_size > self.max_ortho_zoom_size:
                     self.ortho_zoom_size = self.max_ortho_zoom_size
