@@ -752,7 +752,7 @@ class PropertiesPanel(DirectObject):
             text="Run Command",
             pad=(0.25,0.25),
             scale=12,
-            command=getattr(obj.element, definition.valueOptions)
+            command=getattr(obj, definition.valueOptions)
             )
         btn.bind(DGG.MWDOWN, self.scroll, [self.scrollSpeedDown])
         btn.bind(DGG.MWUP, self.scroll, [self.scrollSpeedUp])
