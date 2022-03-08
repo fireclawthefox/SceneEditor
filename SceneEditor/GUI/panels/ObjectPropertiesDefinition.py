@@ -125,6 +125,7 @@ LIGHT_LOOKUP_ATTRS={"get_child":[1], "node":[]}
 LIGHT_LENS_LOOKUP_ATTRS={"get_child":[1], "node":[], "get_lens":[]}
 AMBIENT_LIGHT_LOOKUP_ATTRS={"get_child":[0], "node":[]}
 CAM_LENS_LOOKUP_ATTRS={"get_child":[1], "node":[], "get_lens":[]}
+SHADER_LOOKUP_ATTRS={"getShader":[]}
 
 CAM_LENS_DEFAULT_DEFINITIONS = [
     Definition('aspect_ratio', 'Aspect ratio', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
@@ -158,12 +159,17 @@ LIGHTt_LENS_DEFAULT_DEFINITIONS = [
     Definition('keystone', 'Keystone correction', object, editType=t.base2, lookupAttrs=LIGHT_LENS_LOOKUP_ATTRS)
 ]
 
+SHADING_DEFINITIONS = [
+    Definition('aspect_ratio', 'Aspect ratio', float, lookupAttrs=SHADER_LOOKUP_ATTRS),
+]
+
 DEFINITIONS = {
     #
     # Model
     #
     "model":DEFAULT_DEFINITIONS + [
         Definition('filepath', 'Filepath', str, setAsTag=True),
+        Definition('', 'Clear Shader', None, editType=t.command, valueOptions="clear_shader")
     ],
 
     #
