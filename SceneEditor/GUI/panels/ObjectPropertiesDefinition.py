@@ -243,4 +243,11 @@ DEFINITIONS = {
         Definition('interocular_distance', 'Left/Right eye distance', float, lookupAttrs=CAM_LENS_LOOKUP_ATTRS),
     ],
     "OrthographicLens":DEFAULT_DEFINITIONS + CAM_LENS_DEFAULT_DEFINITIONS,
+
+    #
+    # Physics
+    #
+    "physics": [
+        Definition('name', 'Name', str, setFunctionName="setName"),
+    ],
 }

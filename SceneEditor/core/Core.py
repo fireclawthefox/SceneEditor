@@ -8,6 +8,8 @@ from SceneEditor.core.KillRing import KillRing
 from SceneEditor.core.TransformationHandler import TransformationHandler
 from SceneEditor.core.SelectionHandler import SelectionHandler
 
+from panda3d.physics import ActorNode
+
 from panda3d.core import (
     Plane,
     Vec3,
@@ -42,7 +44,7 @@ from panda3d.core import (
     # Lens
     PerspectiveLens,
     OrthographicLens,
-    GeomNode
+    GeomNode,
     )
 
 class Core(TransformationHandler, SelectionHandler):
@@ -164,6 +166,29 @@ class Core(TransformationHandler, SelectionHandler):
 
         base.messenger.send("update_structure")
         return model
+
+    def add_physics_node(self):
+        actor_node = ActorNode("ActorNode")
+        base.physicsMgr.attach_physical_node(actor_node)
+
+        i = 1
+        physics_node_name = f"PhysicsNode_{i}"
+        while self.scene_model_parent.find(f"**/{physics_node_name}"):
+            i += 1
+            physics_node_name = f"PhysicsNode_{i}"
+
+        physics_np = NodePath(physics_node_name)
+        physics_np.set_tag("object_type", "physics")
+        physics_np.set_tag("scene_object_id", str(uuid4()))
+        physics_np.reparentTo(self.scene_model_parent)
+        physics_np.attachNewNode(actor_node)
+        self.scene_objects.append(physics_np)
+
+        base.messenger.send("addToKillRing",
+            [physics_np, "add", "physics_node", None, None])
+
+        base.messenger.send("update_structure")
+        return physics_np
 
     def add_collision_solid(self, solid_type, solid_info):
         i = 1

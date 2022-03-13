@@ -81,6 +81,7 @@ class MenuBar(DirectObject):
                 DirectMenuItemEntry("Inverse Sphere", base.messenger.send, ["addCollision", ["CollisionInvSphere", {}]]),
                 #Polygon    # Do we want to support this
                 ]),
+            DirectMenuItemEntry("Physics Node", base.messenger.send, ["addPhysicsNode"]),
             DirectMenuItemSubMenu("Light >", [
                 DirectMenuItemEntry("Point Light", base.messenger.send, ["addLight", ["PointLight", {}]]),
                 DirectMenuItemEntry("Spotlight", base.messenger.send, ["addLight", ["Spotlight", {}]]),

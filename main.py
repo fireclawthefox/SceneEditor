@@ -79,6 +79,7 @@ class SceneEditor(ShowBase):
 
         self.core.scene_root.set_shader_auto()
         #self.core.scene_root.setAntialias(AntialiasAttrib.MAuto)
+        self.enableParticles()
 
         # Event actions
         self.mouseEvents = {
@@ -202,6 +203,7 @@ class SceneEditor(ShowBase):
         self.accept("addCollision", self.core.add_collision_solid)
         self.accept("addLight", self.core.add_light)
         self.accept("addCamera", self.core.add_camera)
+        self.accept("addPhysicsNode", self.core.add_physics_node)
         self.accept("addShader", self.core.add_shader)
 
         self.accept("update_structure", self.update_structure_panel)

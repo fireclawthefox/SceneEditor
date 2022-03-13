@@ -42,6 +42,7 @@ class ExporterPy:
             "CollisionSegment",
             "CollisionParabola",
             "CollisionBox",
+            "ActorNode",
             "PointLight",
             "DirectionalLight",
             "AmbientLight",
@@ -108,6 +109,11 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_hpr({obj.get_hpr()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n\n"
+
+                    elif obj.get_tag("object_type") == "physics":
+                        self.content += " "*8 + f"actor_node = ActorNode('{obj.get_name()}')\n"
+                        self.content += " "*8 + f"base.physicsMgr.attach_physical_node(actor_node)\n"
+                        self.content += " "*8 + f"self.{obj_name} = {root_name}.attachNewNode(actor_node)\n\n"
 
                     elif obj.get_tag("object_type") == "light":
                         self.content += " "*8 + f"light = {obj.get_tag('light_type')}('{obj.get_name()}')\n"

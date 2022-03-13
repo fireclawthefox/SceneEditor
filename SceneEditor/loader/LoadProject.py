@@ -117,6 +117,8 @@ class ProjectLoader(DirectObject):
                 info["collision_solid_type"],
                 eval(info["collision_solid_info"]))
             definitions = DEFINITIONS[info["collision_solid_type"]]
+        elif object_type == "physics":
+            model = self.core.add_physics_node()
         elif object_type == "light":
             # create the element
             model = self.core.add_light(
