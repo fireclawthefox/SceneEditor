@@ -1,4 +1,6 @@
 import os
+import logging
+from importlib.machinery import SourceFileLoader
 
 from direct.showbase.ShowBase import ShowBase
 
@@ -76,6 +78,7 @@ class SceneEditor(ShowBase):
         self.mouse_events_disabled = True
         self.keyboard_events_disabled = True
 
+        self.custom_exporters = {}
 
         self.core.scene_root.set_shader_auto()
         #self.core.scene_root.setAntialias(AntialiasAttrib.MAuto)
@@ -150,6 +153,8 @@ class SceneEditor(ShowBase):
 
         self.enable_events()
 
+        self.add_custom_exporters()
+
         base.taskMgr.step()
         base.taskMgr.do_method_later(0, self.mainView.update_3d_display_region, "delayed_display_region_update", extraArgs=[])
 
@@ -182,6 +187,7 @@ class SceneEditor(ShowBase):
         self.accept("saveProject", self.save)
         self.accept("exportProject_python", self.export_python)
         self.accept("exportProject_bam", self.export_bam)
+        self.accept("custom_export", self.custom_export)
         self.accept("loadModel", self.load_model_browser)
         self.accept("loadPanda", self.core.load_model, ["models/panda"])
         self.accept("quit_app", self.quit_app)
@@ -492,6 +498,49 @@ class SceneEditor(ShowBase):
             self.core.scene_objects,
             self.tt)
 
+    def add_custom_exporters(self):
+        # get the custom exporter modules path
+        custom_export_path = ConfigVariableString(
+            "scene-editor-custom-export-path",
+            os.path.join(".","SceneEditor", "custom_export")).getValue()
+
+        # check if the path is good
+        if not os.path.exists(custom_export_path):
+            return
+
+        # walk through the folders
+        for root, dirs, files in os.walk(custom_export_path):
+            for mod_dir in dirs:
+                # ignore these
+                if mod_dir in ["__pycache__"]:
+                    continue
+
+                filepath = os.path.join(root, mod_dir, 'exporter.py')
+
+                # check if the required python file exists
+                if not os.path.exists(filepath):
+                    continue
+
+                # imports the module from the given path
+                logging.debug(f"importing custom exporter {filepath}")
+                exporter = SourceFileLoader("exporter", filepath).load_module()
+
+                # get exporter meta
+                exporter_name = exporter.get_name()
+                exporter_id = exporter.get_name()
+
+                # add the exporter
+                self.custom_exporters[exporter_id] = exporter
+                self.mainView.menuBar.add_export_entry(exporter_name, exporter_id)
+
+    def custom_export(self, exporter):
+        logging.debug(f"Export with {exporter}")
+        self.custom_exporters[exporter].Exporter(
+            self.lastDirPath,
+            self.lastFileNameWOExtension + ".bam",
+            self.core.scene_model_parent,
+            self.core.scene_objects,
+            self.tt)
 
     def load(self):
         ProjectLoader(

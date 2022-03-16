@@ -26,19 +26,20 @@ class MenuBar(DirectObject):
             itemMargin=(2,2,2,2),
             parent=base.pixel2d)
 
-        fileEntries = [
+        self.export_entry = DirectMenuItemSubMenu("Export >", [
+            DirectMenuItemEntry("Python", base.messenger.send, ["exportProject_python"]),
+            DirectMenuItemEntry("Bam", base.messenger.send, ["exportProject_bam"]),
+        ])
+        self.fileEntries = [
             DirectMenuItemEntry("New", base.messenger.send, ["newProject"]),
             DirectMenuSeparator(),
             DirectMenuItemEntry("Open", base.messenger.send, ["loadProject"]),
             DirectMenuItemEntry("Save", base.messenger.send, ["saveProject"]),
-            DirectMenuItemSubMenu("Export >", [
-                DirectMenuItemEntry("Python", base.messenger.send, ["exportProject_python"]),
-                DirectMenuItemEntry("Bam", base.messenger.send, ["exportProject_bam"]),
-            ]),
+            self.export_entry,
             DirectMenuSeparator(),
             DirectMenuItemEntry("Quit", base.messenger.send, ["quit_app"]),
             ]
-        self.file = self.__create_menu_item("File", fileEntries)
+        self.file = self.__create_menu_item("File", self.fileEntries)
 
         viewEntries = [
             DirectMenuItemEntry("Toggle Grid", base.messenger.send, ["toggleGrid"]),
@@ -101,6 +102,26 @@ class MenuBar(DirectObject):
         self.menuBar.addItem(self.view, skipRefresh=True)
         self.menuBar.addItem(self.tools, skipRefresh=True)
         self.menuBar.addItem(self.add)
+
+    def add_export_entry(self, text, tag):
+        self.export_entry.items.append(
+            DirectMenuItemEntry(text, base.messenger.send, ["custom_export", [tag]]))
+        self.fileEntries[4] = self.export_entry
+        self.file["items"] = self.fileEntries
+
+        color = (
+            (0.25, 0.25, 0.25, 1), # Normal
+            (0.35, 0.35, 1, 1), # Click
+            (0.25, 0.25, 1, 1), # Hover
+            (0.1, 0.1, 0.1, 1)) # Disabled
+
+        self.file["item_text_fg"]=(1,1,1,1)
+        self.file["item_text_scale"]=0.8
+        self.file["item_relief"]=DGG.FLAT
+        self.file["item_pad"]=(0.2, 0.2)
+        self.file["itemFrameColor"]=color
+        self.file["popupMenu_itemMargin"]=(0,0,-.1,-.1)
+        self.file["popupMenu_frameColor"]=color
 
     def __create_menu_item(self, text, entries):
         color = (
