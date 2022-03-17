@@ -12,6 +12,7 @@ from panda3d.core import (
     ConfigVariableBool,
     ConfigVariableString,
     AntialiasAttrib,
+    Filename
     )
 
 from SceneEditor.core.CameraController import CameraController
@@ -42,6 +43,11 @@ loadPrcFileData(
     win-size 1280 720
     """)
 
+SIMPLE_PBR_SUPPORT = True
+try:
+    import simplepbr
+except:
+    SIMPLE_PBR_SUPPORT = False
 
 class SceneEditor(ShowBase):
     def __init__(self):
@@ -80,9 +86,19 @@ class SceneEditor(ShowBase):
 
         self.custom_exporters = {}
 
-        self.core.scene_root.set_shader_auto()
-        #self.core.scene_root.setAntialias(AntialiasAttrib.MAuto)
+        if ConfigVariableBool("scene-editor-want-simplepbr", False).getValue() \
+        and SIMPLE_PBR_SUPPORT:
+            simplepbr.init(
+                render_node=self.core.scene_model_parent,
+                enable_shadows=True)
+            pixel2d.set_shader_auto()
+            aspect2d.set_shader_auto()
+        else:
+            self.core.scene_root.set_shader_auto()
+            #self.core.scene_root.setAntialias(AntialiasAttrib.MAuto)
+
         self.enableParticles()
+
 
         # Event actions
         self.mouseEvents = {
@@ -417,7 +433,8 @@ class SceneEditor(ShowBase):
 
     def load_model_browser_action(self, confirm):
         if confirm:
-            self.core.load_model(self.browser.get())
+            model_path = Filename.from_os_specific(self.browser.get())
+            self.core.load_model(model_path)
         self.browser.hide()
         self.browser = None
 

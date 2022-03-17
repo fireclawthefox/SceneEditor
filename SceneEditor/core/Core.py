@@ -139,7 +139,7 @@ class Core(TransformationHandler, SelectionHandler):
     #
     def load_model(self, path):
         model = loader.loadModel(path)
-        model.set_tag("filepath", path)
+        model.set_tag("filepath", str(path))
         model.set_tag("object_type", "model")
         model.set_tag("scene_object_id", str(uuid4()))
         model.reparent_to(self.scene_model_parent)
