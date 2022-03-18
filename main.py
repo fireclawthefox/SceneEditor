@@ -192,6 +192,7 @@ class SceneEditor(ShowBase):
         # CORE EVENTS
         self.accept("setDirtyFlag", self.set_dirty)
         self.accept("clearDirtyFlag", self.set_clean)
+        self.accept("update_selection_highlight_marker", self.core.update_selection_highlight_marker)
 
         #
         # UI EVENTS
@@ -229,7 +230,7 @@ class SceneEditor(ShowBase):
         self.accept("addShader", self.core.add_shader)
 
         self.accept("update_structure", self.update_structure_panel)
-        base.accept("update_properties", self.update_properties_panel)
+        self.accept("update_properties", self.update_properties_panel)
 
         # UI ELEMENT EDITING
         self.accept("toggleElementVisibility", self.core.toggle_visibility)

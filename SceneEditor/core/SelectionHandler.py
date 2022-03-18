@@ -57,6 +57,9 @@ class SelectionHandler:
                 if not picked_obj.is_empty() and not picked_obj.is_hidden():
                     base.messenger.send("pickObject", [picked_obj, multiselect])
 
+    def update_selection_highlight_marker(self):
+        self.selection_highlight_marker.setPos(self.get_selection_middle_point())
+
     def select(self, obj, multiselect=False):
         if obj in self.selected_objects and multiselect:
             # deselect an already selected model
