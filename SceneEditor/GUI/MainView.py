@@ -20,7 +20,7 @@ from SceneEditor.GUI.dialogs.ShaderLoaderDialogManager import ShaderLoaderDialog
 
 
 class MainView(DirectObject):
-    def __init__(self, tooltip, grid, core):
+    def __init__(self, tooltip, grid, core, parent):
         logging.debug("Setup GUI")
 
         self.core = core
@@ -43,7 +43,7 @@ class MainView(DirectObject):
         # our root element for the main box
         self.mainSizer = DirectAutoSizer(
             frameColor=(0,0,0,0),
-            parent=base.pixel2d,
+            parent=parent,
             child=self.mainBox,
             childUpdateSizeFunc=self.mainBox.refresh
             )
