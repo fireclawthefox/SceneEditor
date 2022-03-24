@@ -4,7 +4,7 @@ from SceneEditor.GUI.dialogs.ShaderLoaderDialog import GUI
 from SceneEditor.GUI.dialogs.ShaderInput import GUI as ShaderInput
 from direct.gui import DirectGuiGlobals as DGG
 from direct.gui.DirectFrame import DirectFrame
-from directGuiOverrides.DirectOptionMenu import DirectOptionMenu
+from SceneEditor.directGuiOverrides.DirectOptionMenu import DirectOptionMenu
 from DirectGuiExtension.DirectAutoSizer import DirectAutoSizer
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 from DirectGuiExtension.DirectBoxSizer import DirectBoxSizer

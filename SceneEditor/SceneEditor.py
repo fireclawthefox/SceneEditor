@@ -1,3 +1,4 @@
+import sys
 import os
 import logging
 from importlib.machinery import SourceFileLoader
@@ -6,7 +7,6 @@ from panda3d.core import (
     TextNode,
     CollisionTraverser,
     loadPrcFileData,
-    WindowProperties,
     ConfigVariableBool,
     ConfigVariableString,
     AntialiasAttrib,
@@ -30,18 +30,6 @@ from direct.gui.DirectDialog import OkCancelDialog
 from DirectGuiExtension.DirectTooltip import DirectTooltip
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 
-loadPrcFileData(
-    "",
-    """
-    sync-video #t
-    textures-power-2 none
-    window-title Scene Editor
-    #show-frame-rate-meter #t
-    #want-pstats #t
-    maximized #t
-    model-path $MAIN_DIR/models/
-    win-size 1280 720
-    """)
 
 SIMPLE_PBR_SUPPORT = True
 try:
@@ -54,25 +42,26 @@ class SceneEditor(DirectObject):
 
         DirectObject.__init__(self)
 
-        self.tt = DirectTooltip(
-            text = "Tooltip",
-            #text_fg = (1,1,1,1),
-            pad=(0.2, 0.2),
-            scale = 16,
-            text_align = TextNode.ALeft,
-            frameColor = (1, 1, 0.7, 1),
-            parent=base.pixel2d,
-            sortOrder=1000)
+        fn = Filename.fromOsSpecific(os.path.dirname(__file__))
+        fn.makeTrueCase()
+        self.icon_dir = str(fn) + "/"
+        loadPrcFileData("", f"model-path {self.icon_dir}")
+
+        self.parent = parent
 
         self.opened_dialog_close_functions = []
 
+        # setup core
         self.core = Core()
+
+        # setup 3D scene camera movements
         self.camcontroller = CameraController()
-        self.mainView = MainView(self.tt, self.core.grid, self.core, parent)
 
+        # setup Editor UI
+        self.setup_gui()
+
+        # enable engines collision system
         base.cTrav = CollisionTraverser("base traverser")
-
-        self.mainView.structurePanel.refreshStructureTree(self.core.scene_objects, self.core.selected_objects)
 
         self.dlg_quit = None
         self.dlg_new_project = None
@@ -83,21 +72,22 @@ class SceneEditor(DirectObject):
         self.mouse_events_disabled = True
         self.keyboard_events_disabled = True
 
-        self.custom_exporters = {}
-
+        # Decide which shading system to use
         if ConfigVariableBool("scene-editor-want-simplepbr", False).getValue() \
         and SIMPLE_PBR_SUPPORT:
+            # Use simple PBR
             simplepbr.init(
                 render_node=self.core.scene_model_parent,
                 enable_shadows=True)
             pixel2d.set_shader_auto()
             aspect2d.set_shader_auto()
         else:
+            # Use Pandas auto shader
             self.core.scene_root.set_shader_auto()
             #self.core.scene_root.setAntialias(AntialiasAttrib.MAuto)
 
+        # enable physics and particles
         base.enableParticles()
-
 
         # Event actions
         self.mouseEvents = {
@@ -166,21 +156,67 @@ class SceneEditor(DirectObject):
             "page_down": [self.core.move_element_in_structure, [-1]],
         }
 
+        # saving/loading path
+        self.lastDirPath = ConfigVariableString("work-dir-path", "~").getValue()
+        self.lastFileNameWOExtension = "scene"
+
         self.enable_events()
 
+        sys.excepthook = self.excHandler
+        base.win.setCloseRequestEvent("SceneEditor_quit_app")
+
+        # setup custom exporters
+        self.custom_exporters = {}
         self.add_custom_exporters()
 
         base.taskMgr.step()
         base.taskMgr.do_method_later(0, self.mainView.update_3d_display_region, "delayed_display_region_update", extraArgs=[])
 
+    def enable_editor(self):
+        self.enable_events()
+        self.core.enable()
+
+        self.mainView.mainSizer.refresh()
+
+        # update the display region to the UI
+        self.mainView.update_3d_display_region()
+
+    def disable_editor(self):
+        self.ignore_keyboard_and_mouse_events()
+        self.core.disable()
+        self.disable_events()
+
+        # reset the display region
+        dr = base.cam.node().get_display_region(0)
+        dr.dimensions = (
+            0, 1,
+            0, 1)
+
+        # update the aspect ratio
+        base.camLens.setAspectRatio(
+            base.getSize()[0]/base.getSize()[1])
+
+    def setup_gui(self):
+        self.tt = DirectTooltip(
+            text = "Tooltip",
+            #text_fg = (1,1,1,1),
+            pad=(0.2, 0.2),
+            scale = 16,
+            text_align = TextNode.ALeft,
+            frameColor = (1, 1, 0.7, 1),
+            parent=base.pixel2d,
+            sortOrder=1000)
+
+        self.mainView = MainView(self.tt, self.core.grid, self.core, self.parent)
+        self.mainView.structurePanel.refreshStructureTree(self.core.scene_objects, self.core.selected_objects)
+
+
     def enable_events(self):
         self.accept("escape", self.inteligentEscape)
+        self.accept("SceneEditor_quit_app", self.quit_app)
 
         # SAVING/LOADING
         self.accept("setLastPath", self.setLastPath)
-
-        self.lastDirPath = ConfigVariableString("work-dir-path", "~").getValue()
-        self.lastFileNameWOExtension = "scene"
 
         # PICKING
         self.accept("pickObject", self.core.select)
@@ -305,19 +341,15 @@ class SceneEditor(DirectObject):
         if self.scale_object:
             self.stop_scale_objects()
 
+    def is_dirty(self):
+        return self.core.dirty
 
     def set_dirty(self):
-        wp = WindowProperties()
-        wp.setTitle("*Scene Editor")
-        base.win.requestProperties(wp)
-
+        base.messenger.send("request_dirty_name")
         self.core.dirty = True
 
     def set_clean(self):
-        wp = WindowProperties()
-        wp.setTitle("Scene Editor")
-        base.win.requestProperties(wp)
-
+        base.messenger.send("request_clean_name")
         self.core.dirty = False
         self.hasSaved = True
 
@@ -447,8 +479,8 @@ class SceneEditor(DirectObject):
         self.mainView.propertiesPanel.clear()
         self.mainView.propertiesPanel.setupProperties(self.core.selected_objects)
 
-    def disableEvents(self):
-        self.ignoreAll()
+    def disable_events(self):
+        self.ignore_all()
 
     def new(self):
         if self.core.dirty:
@@ -569,6 +601,20 @@ class SceneEditor(DirectObject):
             False,
             self.tt,
             self.new)
+
+    def do_exception_save(self):
+        ExporterProject(
+            self.lastDirPath,
+            self.lastFileNameWOExtension + ".json",
+            self.core.scene_model_parent,
+            self.core.scene_objects,
+            tooltip=self.tt,
+            exceptionSave=True)
+
+    def excHandler(self, ex_type, ex_value, ex_traceback):
+        logging.error("Unhandled exception", exc_info=(ex_type, ex_value, ex_traceback))
+        print("Try to save project after unhandled exception. Please restart the app to automatically load the exception save file!")
+        self.do_exception_save()
 
     def __quit(self, selection):
         if selection == 1:

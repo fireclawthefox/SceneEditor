@@ -2,7 +2,7 @@ import logging
 from uuid import uuid4
 
 #from direct.directtools.DirectGrid import DirectGrid
-from directtoolsOverrides.DirectGrid import DirectGrid
+from SceneEditor.directtoolsOverrides.DirectGrid import DirectGrid
 
 from SceneEditor.core.TransformationHandler import TransformationHandler
 from SceneEditor.core.SelectionHandler import SelectionHandler
@@ -77,6 +77,12 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
 
         TransformationHandler.__init__(self)
         SelectionHandler.__init__(self)
+
+    def disable(self):
+        self.scene_root.hide()
+
+    def enable(self):
+        self.scene_root.show()
 
     #
     # PROJECT HANDLING

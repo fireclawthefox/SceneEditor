@@ -1,5 +1,7 @@
 import logging
 
+from panda3d.core import NodePath
+
 from direct.showbase.DirectObject import DirectObject
 
 from direct.gui import DirectGuiGlobals as DGG
@@ -23,6 +25,7 @@ class MainView(DirectObject):
     def __init__(self, tooltip, grid, core, parent):
         logging.debug("Setup GUI")
 
+        self.parent = parent
         self.core = core
 
         splitterWidth = 8
@@ -63,11 +66,18 @@ class MainView(DirectObject):
             extendVertical=False)
 
         # the splitter separating the the panels from the main content area
+        splitterPos = 0
+        if type(self.parent) is NodePath:
+            splitterPos = -base.get_size()[0] / 4
+        else:
+            splitterPos = -parent["frameSize"][1] / 4
+
         self.mainSplitter = DirectSplitFrame(
             frameSize=self.get_main_splitter_size(),
             splitterWidth=splitterWidth,
-            splitterPos=-base.getSize()[0]/4)
+            splitterPos=splitterPos)
         self.mainSplitter["frameColor"] = (0,0,0,0)
+        self.mainSplitter.firstFrame["frameColor"] = (0,0,0,0)
         self.mainSplitter.secondFrame["frameColor"] = (0,0,0,0)
 
         # The sizer which makes sure our splitter is filling up
@@ -123,8 +133,9 @@ class MainView(DirectObject):
         self.toolBarSizer["childUpdateSizeFunc"] = self.tool_bar.toolBar.refresh
 
         self.propertiesPanel = PropertiesPanel(self.sidebarSplitter.firstFrame, tooltip)
-        self.structurePanel = StructurePanel(self.sidebarSplitter.secondFrame)
         self.sidebarSplitter["firstFrameUpdateSizeFunc"] = self.propertiesPanel.resizeFrame
+
+        self.structurePanel = StructurePanel(self.sidebarSplitter.secondFrame)
         self.sidebarSplitter["secondFrameUpdateSizeFunc"] = self.structurePanel.resizeFrame
 
         self.mainSplitter["firstFrameUpdateSizeFunc"] = self.sidebarSplitSizer.refresh
@@ -137,28 +148,71 @@ class MainView(DirectObject):
     def update_3d_display_region(self):
         dr = base.cam.node().get_display_region(0)
 
-        dw = base.win.get_size()[0]
-        dh = base.win.get_size()[1]
+        # get the size of the frame the display region should be fit into
+        size = [0,1,-1,0]
+        if type(self.parent) is NodePath:
+            #TODO: Get the size of the actual nodepath
+            # currently we expect the nodepath to be pixel2d
+            size = [0, base.get_size()[0], -base.get_size()[1], 0]
+        else:
+            size = self.parent["frameSize"]
 
+        # store the display resolution
+        dw = base.get_size()[0]
+        dh = base.get_size()[1]
+
+        # store the frame size
+        fw = size[1]
+        fh = -size[2]
+
+        # calculate the shift from top and left
         top_height = (self.menuBarHeight + self.toolBarHeight) / dh
         left_frame_width = DGH.getRealWidth(self.mainSplitter.firstFrame) / dw
+
+        # get the frames position according to pixel2d
+        pos = self.parent.getPos(base.pixel2d)
+
+        # calculate the left and right values for the display region
+        left_x = (pos.x / dw) + left_frame_width
+        right_x = (pos.x / dw) + (fw / dw)
+
+        # calculate the bottom and top values for the display region
+        bottom_y = -(pos.z / dh)
+        top_y = -(pos.z / dh) + (fh / dh) - top_height
+
+        # update the display region with the new values
         dr.dimensions = (
-            left_frame_width,1, #L, R
-            0,1 - top_height) #B, T
+            left_x, right_x,
+            bottom_y, top_y)
 
-        w = (1-left_frame_width) * dw
-        h = (1-top_height) * dh
+        # calculate width and height for the aspect ratio calculation
+        w = 1
+        h = 1
+        if type(self.parent) is NodePath:
+            w = (1-left_frame_width) * dw
+            h = (1-top_height) * dh
+        else:
+            w = (right_x - left_x) * dw
+            h = (top_y - bottom_y) * dh
 
+        # update the aspect ratio
         base.camLens.setAspectRatio(w/h)
 
         base.messenger.send("3d_display_region_changed")
 
     def get_main_splitter_size(self):
+        size = [0,1,1,0]
+        if type(self.parent) is NodePath:
+            width = base.get_size()[0]
+            height = base.get_size()[1]
+        else:
+            width = DGH.getRealWidth(self.parent)
+            height = DGH.getRealHeight(self.parent)
         return (
-            -base.getSize()[0]/2,
-            base.getSize()[0]/2,
+            -width/2,
+            width/2,
             0,
-            base.getSize()[1] - self.menuBarHeight - self.toolBarHeight)
+            height - self.menuBarHeight - self.toolBarHeight)
 
     def show_load_shader_dialog(self):
         base.messenger.send("unregisterKeyboardAndMouseEvents")
