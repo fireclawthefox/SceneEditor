@@ -39,10 +39,10 @@
   - [ ] Help Dialog
   - [ ] Configuration Dialog
   - [ ] Asset browser
-* TODO Physics [50%]
+* DONE Physics [100%]
   - [X] Can we add force fields or the like with the internal engine?
     We may want to make nodes physically interactive, which would require simply reparent them to an ActorNode in the end.
-  - [ ] Implementation
+  - [X] Implementation
 * DONE Exporting [100%]
   - [X] Export all objects and settings as python class
     - Make sure they can be directly used and don't do too much (similar to exported GUI python script)
