@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="SceneEditor",
-    version="22.03",
+    version="22.04",
     author="Fireclaw",
     author_email="fireclawthefox@gmail.com",
     description="A scene editor for the Panda3D engine",
