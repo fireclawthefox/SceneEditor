@@ -106,6 +106,9 @@ class PropertiesPanel(DirectObject):
         height = DGH.getRealHeight(parent)
         self.tooltip = tooltip
         self.parent = parent
+        self.ojbs = []
+
+        self.setupDone = False
 
         self.box = DirectBoxSizer(
             frameColor=(0.25, 0.25, 0.25, 1),
@@ -171,18 +174,27 @@ class PropertiesPanel(DirectObject):
         self.propertiesFrame["frameSize"] = (
                 self.sizer["frameSize"][0], self.sizer["frameSize"][1],
                 self.sizer["frameSize"][2]+DGH.getRealHeight(self.lblHeader), self.sizer["frameSize"][3])
-        self.propertiesFrame
+
+        if self.setupDone and not taskMgr.hasTaskNamed("updatePropPanel"):
+            taskMgr.doMethodLater(0.99, self.clear, "clearPropPanel", extraArgs=[])
+            taskMgr.doMethodLater(1, self.refreshProperties, "updatePropPanel", extraArgs=[])
+
 
     def setupProperties(self, objs):
         """Creates the set of editable properties for the given element"""
+        if taskMgr.hasTaskNamed("updatePropPanel"):
+            taskMgr.remove("updatePropPanel")
+        self.ignoreAll()
+        self.ojbs = objs
+        self.refreshProperties()
 
+    def refreshProperties(self):
+        objs = self.ojbs
         if objs == []: return
 
-        self.ignoreAll()
         # create the frame that will hold all our properties
         self.mainBoxFrame = DirectBoxSizer(
             orientation=DGG.VERTICAL,
-            itemAlign=DirectBoxSizer.A_Left,
             frameColor=VBase4(0, 0, 0, 0),
             parent=self.propertiesFrame.getCanvas(),
             suppressMouse=True,
@@ -200,7 +212,7 @@ class PropertiesPanel(DirectObject):
                 text_align=TextNode.ACenter,
                 frameSize=VBase4(
                     -self.propertiesFrame["frameSize"][1],
-                    self.propertiesFrame["frameSize"][1]-SCROLLBARWIDTH,
+                    self.propertiesFrame["frameSize"][1],
                     -10,
                     20),
                 frameColor=VBase4(0.7, 0.7, 0.7, 1),
@@ -238,6 +250,7 @@ class PropertiesPanel(DirectObject):
 
                     self.updateSection(section)
 
+                self.setupDone = True
             except Exception:
                 e = sys.exc_info()[1]
                 base.messenger.send("showWarning", [str(e)])
@@ -252,7 +265,7 @@ class PropertiesPanel(DirectObject):
         self.mainBoxFrame.refresh()
 
         self.propertiesFrame["canvasSize"] = (
-            0,
+            self.propertiesFrame["frameSize"][0],
             self.propertiesFrame["frameSize"][1]-SCROLLBARWIDTH,
             self.mainBoxFrame.bounds[2],
             0)
@@ -272,15 +285,16 @@ class PropertiesPanel(DirectObject):
             frameColor=(1, 1, 1, 1),
             headerheight=24,
             frameSize=(
-                -self.propertiesFrame["frameSize"][1],
-                self.propertiesFrame["frameSize"][1]-SCROLLBARWIDTH,
+                self.propertiesFrame["frameSize"][0],
+                self.propertiesFrame["frameSize"][1],
                 0, 20))
 
         self.accept(section.getCollapsedEvent(), self.sectionCollapsed, extraArgs=[section])
         self.accept(section.getExtendedEvent(), self.updateCanvasSize)
 
         section.toggleCollapseButton["text_scale"] = 12
-        section.toggleCollapseButton["text_pos"] = (0, -12)
+        tp = section.toggleCollapseButton["text_pos"]
+        section.toggleCollapseButton["text_pos"] = (tp[0] + 5, -12)
 
         section.toggleCollapseButton.bind(DGG.MWDOWN, self.scroll, [self.scrollSpeedDown])
         section.toggleCollapseButton.bind(DGG.MWUP, self.scroll, [self.scrollSpeedUp])
@@ -291,7 +305,7 @@ class PropertiesPanel(DirectObject):
         self.boxFrame = DirectBoxSizer(
             pos=(0, 0, -section["headerheight"]),
             frameSize=(
-                -self.propertiesFrame["frameSize"][1],
+                self.propertiesFrame["frameSize"][0],
                 self.propertiesFrame["frameSize"][1]-SCROLLBARWIDTH,
                 0, 0),
             orientation=DGG.VERTICAL,
@@ -310,7 +324,7 @@ class PropertiesPanel(DirectObject):
     def updateSection(self, section):
         self.boxFrame.refresh()
         fs = self.boxFrame["frameSize"]
-        section["frameSize"] = (fs[0], fs[1], fs[2]-section["headerheight"], fs[3])
+        section["frameSize"] = (fs[0], fs[1]-SCROLLBARWIDTH, fs[2]-section["headerheight"], fs[3])
         section.updateFrameSize()
 
     def createProperty(self, definition, obj):
@@ -350,7 +364,6 @@ class PropertiesPanel(DirectObject):
         l = DirectLabel(
             text=description,
             text_scale=16,
-            text_pos=(-10, 0),
             text_align=TextNode.ACenter,
             frameSize=VBase4(self.propertiesFrame["frameSize"][0], self.propertiesFrame["frameSize"][1], -10, 20),
             frameColor=VBase4(0.85, 0.85, 0.85, 1),
@@ -363,8 +376,8 @@ class PropertiesPanel(DirectObject):
         l = DirectLabel(
             text=description,
             text_scale=12,
-            text_pos=(self.propertiesFrame["frameSize"][0], 0),
             text_align=TextNode.ALeft,
+            text_pos=(self.propertiesFrame["frameSize"][0] + 5, 0),
             frameSize=VBase4(self.propertiesFrame["frameSize"][0], self.propertiesFrame["frameSize"][1], -10, 20),
             frameColor=VBase4(0.85, 0.85, 0.85, 1),
             state=DGG.NORMAL)
@@ -625,7 +638,7 @@ class PropertiesPanel(DirectObject):
 
         self.__createPropertyHeader(definition.visiblename)
         listItems = PropertyHelper.getValues(definition, obj)
-        width = DGH.getRealWidth(self.boxFrame)
+        width = DGH.getRealWidth(self.boxFrame) - SCROLLBARWIDTH
         entriesBox = DirectBoxSizer(
             orientation=DGG.VERTICAL,
             itemAlign=DirectBoxSizer.A_Left,
@@ -698,7 +711,7 @@ class PropertiesPanel(DirectObject):
         path = PropertyHelper.getValues(definition, obj)
         if type(path) is not str:
             path = ""
-        width = DGH.getRealWidth(self.boxFrame)
+        width = DGH.getRealWidth(self.boxFrame) - SCROLLBARWIDTH
         entry = self.__createTextEntry(path, width, update)
         self.boxFrame.addItem(entry, skipRefresh=True)
 
