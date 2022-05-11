@@ -80,9 +80,13 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
 
     def disable(self):
         self.scene_root.hide()
+        self.grid.hide()
+        self.axis.hide()
 
     def enable(self):
         self.scene_root.show()
+        self.grid.show()
+        self.axis.show()
 
     #
     # PROJECT HANDLING
