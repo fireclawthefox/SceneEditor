@@ -170,7 +170,7 @@ class SceneEditor(DirectObject):
         self.add_custom_exporters()
 
         base.taskMgr.step()
-        base.taskMgr.do_method_later(0, self.mainView.update_3d_display_region, "delayed_display_region_update", extraArgs=[])
+        base.taskMgr.do_method_later(0, self.mainView.update_3d_display_region, "SceneEditor_delayed_display_region_update", extraArgs=[])
 
     def enable_editor(self):
         self.enable_events()
@@ -181,10 +181,14 @@ class SceneEditor(DirectObject):
         # update the display region to the UI
         self.mainView.update_3d_display_region()
 
+        self.camcontroller.enable_cam_controller()
+
     def disable_editor(self):
         self.ignore_keyboard_and_mouse_events()
         self.core.disable()
         self.disable_events()
+
+        self.camcontroller.disable_cam_controller()
 
         # reset the display region
         dr = base.cam.node().get_display_region(0)

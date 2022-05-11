@@ -49,8 +49,17 @@ class CameraController:
         self.pivot.setHpr(self.pivotDefaultH, self.pivotDefaultP, 0)
         camera.reparentTo(self.pivot)
 
+        self.enable_cam_controller()
+
+    def enable_cam_controller(self):
+        if base.taskMgr.hasTaskNamed("SceneEditor_task_camActualisation"):
+            return
+
         # add the cameras update task so it will be updated every frame
-        base.taskMgr.add(self.updateCam, "task_camActualisation", priority=-4)
+        base.taskMgr.add(self.updateCam, "SceneEditor_task_camActualisation", priority=-4)
+
+    def disable_cam_controller(self):
+        base.taskMgr.remove("SceneEditor_task_camActualisation")
 
     def toggle_lense(self):
         if self.is_orthographic:
