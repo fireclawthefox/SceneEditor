@@ -37,15 +37,15 @@ def setupLog(editor_name):
             # this file does not have a date ending
             pass
 
-    logfile = os.path.join(logPath, f"{editor_name}.log")
-    handler = TimedRotatingFileHandler(logfile)
+    log_file = os.path.join(logPath, f"{editor_name}.log")
+    handler = TimedRotatingFileHandler(log_file)
     consoleHandler = StreamHandler()
     logging.basicConfig(
         level=logging.DEBUG,
         handlers=[handler])#, consoleHandler])
-    prcFileName = os.path.join(basePath, f".{editor_name}.prc")
-    if os.path.exists(prcFileName):
-        loadPrcFile(Filename.fromOsSpecific(prcFileName))
+    config_file = os.path.join(basePath, f".{editor_name}.prc")
+    if os.path.exists(config_file):
+        loadPrcFile(Filename.fromOsSpecific(config_file))
 
         # make sure to load our custom paths
         paths_cfg = ConfigVariableSearchPath("custom-model-path", "").getValue()
@@ -53,7 +53,7 @@ def setupLog(editor_name):
             line = "model-path {}".format(str(path))
             loadPrcFileData("", line)
     else:
-        with open(prcFileName, "w") as prcFile:
+        with open(config_file, "w") as prcFile:
             prcFile.write("skip-ask-for-quit #f\n")
             prcFile.write("create-executable-scripts #f\n")
             prcFile.write("show-toolbar #t\n")
