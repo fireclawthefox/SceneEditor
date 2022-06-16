@@ -158,6 +158,8 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
         base.messenger.send("addToKillRing",
             [model, "add", "model", None, None])
 
+        self.set_edited_tag(model, "filepath")
+
         base.messenger.send("update_structure")
         return model
 

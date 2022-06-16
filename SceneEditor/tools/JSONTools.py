@@ -77,6 +77,8 @@ class JSONTools:
         # add all edited properties
         for definition in DEFINITIONS[definition_object_type]:
             if definition.internalName in edit_list:
+                if definition.internalName == "":
+                    continue
                 object_dict[definition.internalName] = str(PropertyHelper.getValues(definition, scene_object))
 
         return object_dict

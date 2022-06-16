@@ -106,7 +106,8 @@ class ProjectLoader(DirectObject):
         if object_type == "model":
             # create the element
             model = self.core.load_model(info["filepath"])
-            model.set_transparency(eval(info["transparency"]))
+            if "transparency" in info:
+                model.set_transparency(eval(info["transparency"]))
             definitions = DEFINITIONS[object_type]
         elif object_type == "empty":
             # create the element
