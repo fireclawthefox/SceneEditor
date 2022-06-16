@@ -112,6 +112,7 @@ class ProjectLoader(DirectObject):
         elif object_type == "empty":
             # create the element
             model = self.core.add_empty()
+            definitions = DEFINITIONS[object_type]
         elif object_type == "collision":
             # create the element
             model = self.core.add_collision_solid(
@@ -120,6 +121,7 @@ class ProjectLoader(DirectObject):
             definitions = DEFINITIONS[info["collision_solid_type"]]
         elif object_type == "physics":
             model = self.core.add_physics_node()
+            definitions = DEFINITIONS[object_type]
         elif object_type == "light":
             # create the element
             model = self.core.add_light(
