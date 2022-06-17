@@ -120,7 +120,7 @@ DEFAULT_DEFINITIONS = [
 ]
 
 # Lookup definitions for how to get to specific attributes
-COLLISION_LOOKUP_ATTRS={"node":[], "get_solid":[0]}
+COLLISION_LOOKUP_ATTRS={"node":[], "modify_solid":[0]}
 LIGHT_LOOKUP_ATTRS={"get_child":[1], "node":[]}
 LIGHT_LENS_LOOKUP_ATTRS={"get_child":[1], "node":[], "get_lens":[]}
 AMBIENT_LIGHT_LOOKUP_ATTRS={"get_child":[0], "node":[]}
@@ -185,8 +185,8 @@ DEFINITIONS = {
         Definition('radius', 'Radius', float, setFunctionName="set_radius", lookupAttrs=COLLISION_LOOKUP_ATTRS),
     ],
     "CollisionBox":DEFAULT_DEFINITIONS + [
-        Definition('center', 'Center', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
-        Definition('dimension', 'Dimension', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('center', 'Center', object, editType=t.base3, setFunctionName="set_center", lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        #Definition('dimension', 'Dimension', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
     ],
     "CollisionPlane":DEFAULT_DEFINITIONS + [
         #Definition('center', 'Center', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
@@ -210,7 +210,7 @@ DEFINITIONS = {
         Definition('direction', 'Direction', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
     ],
     "CollisionInvSphere":DEFAULT_DEFINITIONS + [
-        Definition('center', 'Center', object, editType=t.base3, lookupAttrs=COLLISION_LOOKUP_ATTRS),
+        Definition('center', 'Center', object, editType=t.base3, setFunctionName="set_center", lookupAttrs=COLLISION_LOOKUP_ATTRS),
         Definition('radius', 'Radius', float, lookupAttrs=COLLISION_LOOKUP_ATTRS),
     ],
 

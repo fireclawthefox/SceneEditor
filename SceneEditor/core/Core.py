@@ -202,12 +202,16 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
         base.messenger.send("update_structure")
         return physics_np
 
-    def add_collision_solid(self, solid_type, solid_info):
+    def get_new_col_solid_name(self, solid_type):
         i = 1
         solid_name = f"{solid_type}_{i}"
         while self.scene_model_parent.find(f"**/{solid_name}"):
             i += 1
             solid_name = f"{solid_type}_{i}"
+        return solid_name
+
+    def add_collision_solid(self, solid_type, solid_info):
+        solid_name = self.get_new_col_solid_name(solid_type)
 
         cn = CollisionNode(solid_name)
         col_np = self.scene_model_parent.attachNewNode(cn)
@@ -286,7 +290,7 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
             col_np.set_tag("collision_solid_info", str(solid_info).replace(" ", ", ").replace(":,", ":"))
         else:
             col_np.set_tag("collision_solid_info", str(solid_info))
-        cn.addSolid(col)
+        cn.add_solid(col)
 
         # usual scene editor setup
         self.prepare_for_editor(col_np)
@@ -571,8 +575,42 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
             for obj in self.copied_objects:
                 new_obj = obj.copy_to(parent)
                 new_obj.set_tag("scene_object_id", str(uuid4()))
+                if obj.has_tag("edited_properties"):
+                    new_obj.set_tag(
+                        "edited_properties",
+                        obj.get_tag("edited_properties"))
                 if obj.get_tag("object_type") == "collision":
-                    todo
+                    solid_type = obj.get_tag("collision_solid_type")
+                    src_solid = obj.node().get_solid(0)
+                    dst_solid = new_obj.node().modify_solid(0)
+                    new_solid_name = self.get_new_col_solid_name(solid_type)
+                    new_obj.set_name(new_solid_name)
+                    if solid_type == "CollisionSphere":
+                        dst_solid.set_center(src_solid.center)
+                        dst_solid.radius = src_solid.radius
+                    elif solid_type == "CollisionBox":
+                        dst_solid.set_center(src_solid.center)
+                        # TODO: isn't there any way to copy the dimension of a box
+                        #dst_solid.min = src_solid.min
+                        #dst_solid.max = src_solid.max
+                    elif solid_type == "CollisionPlane":
+                        dst_solid.plane = src_solid.plane
+                    elif solid_type == "CollisionCapsule":
+                        dst_solid.point_a = src_solid.point_a
+                        dst_solid.point_b = src_solid.point_b
+                        dst_solid.radius = src_solid.radius
+                    elif solid_type == "CollisionLine":
+                        dst_solid.origin = src_solid.origin
+                        dst_solid.direction = src_solid.direction
+                    elif solid_type == "CollisionSegment":
+                        dst_solid.point_a = src_solid.point_a
+                        dst_solid.point_b = src_solid.point_b
+                    elif solid_type == "CollisionRay":
+                        dst_solid.origin = src_solid.origin
+                        dst_solid.direction = src_solid.direction
+                    elif solid_type == "CollisionInvSphere":
+                        dst_solid.set_center(src_solid.center)
+                        dst_solid.radius = src_solid.radius
                 elif obj.get_tag("object_type") == "light":
                     light_np = light_model_np.attachNewNode(light)
                     new_obj.set_tag("object_type", "light")
