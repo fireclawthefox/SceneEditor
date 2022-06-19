@@ -44,7 +44,6 @@ class ExporterPy:
             "CollisionSegment",
             "CollisionParabola",
             "CollisionBox",
-            "ActorNode",
             "PointLight",
             "DirectionalLight",
             "AmbientLight",
@@ -55,10 +54,15 @@ class ExporterPy:
         self.content += "from panda3d.core import (\n"
         for inc in includes:
             self.content += f"    {inc},\n"
-        self.content += ")\n\n"
+        self.content += ")\n"
+        self.content += "from panda3d.physics import ActorNode\n"
+        self.content += "\n"
 
         self.content += "class Scene:\n"
-        self.content += "    def __init__(self, rootParent=base.render):\n"
+        self.content += "    def __init__(self, rootParent=None):\n"
+        self.content += " "*8 + "if rootParent is None:\n"
+        self.content += " "*12 + "rootParent = base.render\n"
+        self.content += "\n"
 
         self.write_scene_element(scene_root, "rootParent")
 
