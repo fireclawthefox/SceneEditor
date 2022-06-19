@@ -30,6 +30,8 @@ class ExporterPy:
             "LPoint3f",
             "LVector3f",
             "LVecBase3f",
+            "LVecBase2f",
+            "LVector2f",
             "LPlane",
             "NodePath",
             "CollisionNode",
@@ -84,14 +86,16 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_hpr({obj.get_hpr()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n"
-                        self.content += " "*8 + f"self.{obj_name}.reparent_to({root_name})\n\n"
+                        self.content += " "*8 + f"self.{obj_name}.reparent_to({root_name})\n"
+                        self.content += "\n"
 
                     if obj.get_tag("object_type") == "empty":
                         self.content += " "*8 + f"self.{obj_name} = NodePath('{obj_name}')\n"
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_hpr({obj.get_hpr()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n"
-                        self.content += " "*8 + f"self.{obj_name}.reparent_to({root_name})\n\n"
+                        self.content += " "*8 + f"self.{obj_name}.reparent_to({root_name})\n"
+                        self.content += "\n"
 
                     elif obj.get_tag("object_type") == "collision":
                         self.content += " "*8 + f"col = {obj.get_tag('collision_solid_type')}(\n"
@@ -108,12 +112,14 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name} = {root_name}.attachNewNode(cn)\n"
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_hpr({obj.get_hpr()})\n"
-                        self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n\n"
+                        self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n"
+                        self.content += "\n"
 
                     elif obj.get_tag("object_type") == "physics":
                         self.content += " "*8 + f"actor_node = ActorNode('{obj.get_name()}')\n"
                         self.content += " "*8 + f"base.physicsMgr.attach_physical_node(actor_node)\n"
-                        self.content += " "*8 + f"self.{obj_name} = {root_name}.attachNewNode(actor_node)\n\n"
+                        self.content += " "*8 + f"self.{obj_name} = {root_name}.attachNewNode(actor_node)\n"
+                        self.content += "\n"
 
                     elif obj.get_tag("object_type") == "light":
                         self.content += " "*8 + f"light = {obj.get_tag('light_type')}('{obj.get_name()}')\n"
@@ -124,10 +130,44 @@ class ExporterPy:
                         self.content += " "*8 + f"self.{obj_name}.set_pos({obj.get_pos()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_hpr({obj.get_hpr()})\n"
                         self.content += " "*8 + f"self.{obj_name}.set_scale({obj.get_scale()})\n"
-                        self.content += " "*8 + f"{root_name}.setLight(self.{obj_name})\n\n"
+                        self.content += " "*8 + f"{root_name}.setLight(self.{obj_name})\n"
+                        self.content += "\n"
 
                     elif obj.get_tag("object_type") == "camera":
-                        self.content += " "*8 + f"self.{obj_name} = Camera('{obj_name}', {obj.get_tag('camera_type')}())\n\n"
+                        # CAM LENS
+                        lens = obj.get_child(1).node().get_lens()
+
+                        obj_lens_name = obj_name + "_lens"
+                        self.content += " "*8 + f"self.{obj_lens_name} = {obj.get_tag('camera_type')}()\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.aspect_ratio = {lens.aspect_ratio}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.fov = {lens.fov}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.film_size = {lens.film_size}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.film_offset = {lens.film_offset}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.near = {lens.near}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.far = {lens.far}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.focal_length = {lens.focal_length}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.min_fov = {lens.min_fov}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.view_hpr = {lens.view_hpr}\n"
+                        print(lens.change_event)
+                        if lens.change_event:
+                            self.content += " "*8 + f"self.{obj_lens_name}.change_event = {lens.change_event}\n"
+                        self.content += " "*8 + f"self.{obj_lens_name}.keystone = {lens.keystone}\n"
+
+                        if obj.get_tag("camera_type") == "PerspectiveLens":
+                            self.content += " "*8 + f"self.{obj_lens_name}.convergence_distance = {lens.convergence_distance}\n"
+                            self.content += " "*8 + f"self.{obj_lens_name}.interocular_distance = {lens.interocular_distance}\n"
+
+                        # CAM NODE
+                        self.content += " "*8 + f"self.{obj_name} = Camera('{obj.get_name()}', self.{obj_lens_name})\n"
+
+                        # CAM NODEPATH
+                        obj_np_name = obj_name + "_np"
+                        self.content += " "*8 + f"self.{obj_np_name} = {root_name}.attachNewNode(self.{obj_name})\n"
+                        self.content += " "*8 + f"self.{obj_np_name}.set_pos({obj.get_pos()})\n"
+                        self.content += " "*8 + f"self.{obj_np_name}.set_hpr({obj.get_hpr()})\n"
+                        self.content += " "*8 + f"self.{obj_np_name}.set_scale({obj.get_scale()})\n"
+
+                        self.content += "\n"
 
                 self.write_scene_element(obj, obj.get_name())
 
