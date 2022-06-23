@@ -326,6 +326,7 @@ class PropertiesPanel(DirectObject):
         fs = self.boxFrame["frameSize"]
         section["frameSize"] = (fs[0], fs[1]-SCROLLBARWIDTH, fs[2]-section["headerheight"], fs[3])
         section.updateFrameSize()
+        section.setCollapsed()
 
     def createProperty(self, definition, obj):
         if definition.editType == ObjectPropertiesDefinition.PropertyEditTypes.integer:
