@@ -25,6 +25,7 @@ class StructurePanel():
 
         self.parent = parent
 
+        self.object_list = []
 
         self.box = DirectBoxSizer(
             frameColor=(0.25, 0.25, 0.25, 1),
@@ -142,22 +143,17 @@ class StructurePanel():
 
     def __make_structure_frame_tree_item(self, obj, parents_level, z):
         parent_shift = 10
+        margin = 5
+        shift = 6
+        self.object_list.append(obj)
         if not obj.has_tag("scene_object_id"):
-            lbl = DirectLabel(
-                text=obj.getName(),
-                text_align=TextNode.ALeft,
-                frameColor=(0,0,0,0),
-                relief=DGG.FLAT,
-                pos=(self.structureFrame["frameSize"][0] + parent_shift*parents_level, 0, z),
-                scale=16,
-                parent=self.structureFrame.getCanvas())
-            self.maxWidth = max(self.maxWidth, lbl.getX() + lbl.getWidth()*lbl.getScale()[0])
-        else:
-            margin = 5
-            shift = 6
-
-            if hasattr(obj, "getChildren"):
-                if len(obj.getChildren()) > 0:
+            if hasattr(obj, "getChildren") and obj.getNumChildren() > 0:
+                is_good = False
+                for child in obj.getChildren():
+                    if child.get_name() != "":
+                        is_good = True
+                        break
+                if is_good:
                     # Collapse Button
                     btnC = DirectCheckBox(
                         relief=DGG.FLAT,
@@ -175,6 +171,36 @@ class StructurePanel():
                     btnC.setTransparency(TransparencyAttrib.M_alpha)
                     btnC.bind(DGG.MWDOWN, self.scroll, [0.01])
                     btnC.bind(DGG.MWUP, self.scroll, [-0.01])
+
+            lbl = DirectLabel(
+                text=obj.getName(),
+                text_align=TextNode.ALeft,
+                frameColor=(0,0,0,0),
+                relief=DGG.FLAT,
+                pos=(self.structureFrame["frameSize"][0] + parent_shift*parents_level, 0, z),
+                scale=16,
+                parent=self.structureFrame.getCanvas())
+            self.maxWidth = max(self.maxWidth, lbl.getX() + lbl.getWidth()*lbl.getScale()[0])
+        else:
+
+            if hasattr(obj, "getChildren") and obj.getNumChildren() > 0:
+                # Collapse Button
+                btnC = DirectCheckBox(
+                    relief=DGG.FLAT,
+                    pos=(self.structureFrame["frameSize"][0] + parent_shift*parents_level - 16 + margin, 0, z+shift),
+                    frameSize=(-8, 8, -8, 8),
+                    frameColor=(0,0,0,0),
+                    command=self.__collapse_element,
+                    extraArgs=[obj],
+                    image="icons/Collapsed.png" if obj in self.collapsedElements else "icons/Collapse.png",
+                    uncheckedImage="icons/Collapse.png",
+                    checkedImage="icons/Collapsed.png",
+                    image_scale=8,
+                    isChecked=obj in self.collapsedElements,
+                    parent=self.structureFrame.getCanvas())
+                btnC.setTransparency(TransparencyAttrib.M_alpha)
+                btnC.bind(DGG.MWDOWN, self.scroll, [0.01])
+                btnC.bind(DGG.MWUP, self.scroll, [-0.01])
 
             # Element Name
             btn = DirectButton(
@@ -280,10 +306,22 @@ class StructurePanel():
         if obj is not None:
             base.messenger.send("moveElementInStructure", [direction, [obj]])
 
-    def __collapse_element(self, collapse, obj):
+    def __collapse_element(self, collapse, obj, update_tree=True):
         if obj is not None:
             if collapse:
-                self.collapsedElements.append(obj)
+                if obj not in self.collapsedElements:
+                    self.collapsedElements.append(obj)
             else:
-                self.collapsedElements.remove(obj)
-            base.messenger.send("update_structure")
+                if obj in self.collapsedElements:
+                    self.collapsedElements.remove(obj)
+            if update_tree:
+                base.messenger.send("update_structure")
+
+    def collapse_all(self):
+        self.collapsedElements = []
+        scene_roots = ["scene_root", "scene_model_parent", "render"]
+        for obj in self.object_list:
+            if obj.get_name() in scene_roots or obj.get_name() == "":
+                continue
+            self.__collapse_element(True, obj, False)
+        base.messenger.send("update_structure")

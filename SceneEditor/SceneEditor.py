@@ -270,6 +270,7 @@ class SceneEditor(DirectObject):
 
         self.accept("update_structure", self.update_structure_panel)
         self.accept("update_properties", self.update_properties_panel)
+        self.accept("collapse_structure", self.collapse_structure)
 
         # UI ELEMENT EDITING
         self.accept("toggleElementVisibility", self.core.toggle_visibility)
@@ -478,6 +479,10 @@ class SceneEditor(DirectObject):
         self.mainView.structurePanel.refreshStructureTree(
             self.core.scene_objects,
             self.core.selected_objects)
+
+    def collapse_structure(self):
+        self.mainView.structurePanel.collapse_all()
+
 
     def update_properties_panel(self):
         self.mainView.propertiesPanel.clear()

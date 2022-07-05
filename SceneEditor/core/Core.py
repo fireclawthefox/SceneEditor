@@ -161,6 +161,7 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
         self.set_edited_tag(model, "filepath")
 
         base.messenger.send("update_structure")
+        base.messenger.send("collapse_structure")
         return model
 
     def add_empty(self):
