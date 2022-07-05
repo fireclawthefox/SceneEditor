@@ -1,14 +1,10 @@
-from panda3d.core import TransparencyAttrib, ConfigVariableBool
-
 from direct.showbase.DirectObject import DirectObject
-
 from direct.gui import DirectGuiGlobals as DGG
-DGG.BELOW = "below"
-
-from direct.gui.DirectButton import DirectButton
-from direct.gui.DirectFrame import DirectFrame
-from direct.gui.DirectCheckBox import DirectCheckBox
-from DirectGuiExtension.DirectMenuItem import DirectMenuItem, DirectMenuItemEntry, DirectMenuItemSubMenu, DirectMenuSeparator
+from DirectGuiExtension.DirectMenuItem import (
+    DirectMenuItem,
+    DirectMenuItemEntry,
+    DirectMenuItemSubMenu,
+    DirectMenuSeparator)
 from DirectGuiExtension.DirectBoxSizer import DirectBoxSizer
 
 class MenuBar(DirectObject):
