@@ -20,6 +20,8 @@ class ToolBar(DirectObject):
         left = screenWidthPx*0.25
         barWidth = screenWidthPx*0.75
 
+        self.active_alpha_type = TransparencyAttrib.M_alpha
+
         color = (
             (0.25, 0.25, 0.25, 1), # Normal
             (0.35, 0.35, 1, 1), # Click
@@ -49,7 +51,7 @@ class ToolBar(DirectObject):
             extraArgs=["newProject"],
             image="icons/New.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Create New Scene (Ctrl-N)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -62,7 +64,7 @@ class ToolBar(DirectObject):
             extraArgs=["saveProject"],
             image="icons/Save.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Save Scene as Project (Ctrl-S)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -76,7 +78,7 @@ class ToolBar(DirectObject):
             extraArgs=["exportProject_python"],
             image="icons/Export.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Export Scene as Python Script (Ctrl-E)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -90,7 +92,7 @@ class ToolBar(DirectObject):
             extraArgs=["loadProject"],
             image="icons/Load.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Load Scene project (Ctrl-O)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -106,7 +108,7 @@ class ToolBar(DirectObject):
             extraArgs=["undo"],
             image="icons/Undo.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Undo last action (Ctrl-Z)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -120,7 +122,7 @@ class ToolBar(DirectObject):
             extraArgs=["redo"],
             image="icons/Redo.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Redo last action (Ctrl-Y)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -134,7 +136,7 @@ class ToolBar(DirectObject):
             extraArgs=["cycleRedo"],
             image="icons/CycleRedo.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Cycle through redo branches (Ctrl-Shift-Y)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -150,7 +152,7 @@ class ToolBar(DirectObject):
             extraArgs=["removeElement"],
             image="icons/Delete.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Delete selected element (Del)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -168,7 +170,7 @@ class ToolBar(DirectObject):
             image_scale=24,
             isChecked=not self.grid.isHidden(),
             command=self.toggleGrid)
-        self.cb_grid.setTransparency(TransparencyAttrib.M_multisample)
+        self.cb_grid.setTransparency(self.active_alpha_type)
         self.cb_grid.bind(DGG.ENTER, self.tt.show, ["Toggle Grid (Ctrl-G)"])
         self.cb_grid.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(self.cb_grid)
@@ -201,7 +203,7 @@ class ToolBar(DirectObject):
             extraArgs=["showHelp"],
             image="icons/Help.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Show a help Dialog (F1)"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
@@ -215,7 +217,7 @@ class ToolBar(DirectObject):
             extraArgs=["showSettings"],
             image="icons/Settings.png",
             image_scale=24)
-        btn.setTransparency(TransparencyAttrib.M_multisample)
+        btn.setTransparency(self.active_alpha_type)
         btn.bind(DGG.ENTER, self.tt.show, ["Show Designer Settings"])
         btn.bind(DGG.EXIT, self.tt.hide)
         self.toolBar.addItem(btn)
