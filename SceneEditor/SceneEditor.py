@@ -537,7 +537,7 @@ class SceneEditor(DirectObject):
     def save(self):
         ExporterProject(
             self.lastDirPath,
-            self.lastFileNameWOExtension + ".json",
+            self.lastFileNameWOExtension + ".scene",
             self.core.scene_model_parent,
             self.core.scene_objects,
             tooltip=self.tt)
@@ -605,7 +605,7 @@ class SceneEditor(DirectObject):
     def load(self):
         ProjectLoader(
             self.lastDirPath,
-            self.lastFileNameWOExtension + ".json",
+            self.lastFileNameWOExtension + ".scene",
             self.core,
             False,
             self.tt,
@@ -614,7 +614,7 @@ class SceneEditor(DirectObject):
     def do_exception_save(self):
         ExporterProject(
             self.lastDirPath,
-            self.lastFileNameWOExtension + ".json",
+            self.lastFileNameWOExtension + ".scene",
             self.core.scene_model_parent,
             self.core.scene_objects,
             tooltip=self.tt,

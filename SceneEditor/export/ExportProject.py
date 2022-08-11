@@ -47,7 +47,7 @@ class ExporterProject:
         self.dlgOverwrite = None
         self.dlgOverwriteShadow = None
 
-        tmpPath = os.path.join(tempfile.gettempdir(), "SEExceptionSave.json")
+        tmpPath = os.path.join(tempfile.gettempdir(), "SEExceptionSave.scene")
         self.__executeSave(True, tmpPath)
         logging.info("Wrote crash session file to {}".format(tmpPath))
 
@@ -55,7 +55,7 @@ class ExporterProject:
         self.dlgOverwrite = None
         self.dlgOverwriteShadow = None
         if fileName == "":
-            fileName = os.path.join(tempfile.gettempdir(), "SEAutosave.json")
+            fileName = os.path.join(tempfile.gettempdir(), "SEAutosave.scene")
         self.__executeSave(True, fileName)
         logging.info("Wrote autosave file to {}".format(fileName))
 

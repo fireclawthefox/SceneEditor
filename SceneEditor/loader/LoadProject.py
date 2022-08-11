@@ -45,7 +45,7 @@ class ProjectLoader(DirectObject):
             self.browser.show()
 
     def excLoad(self):
-        tmpPath = os.path.join(tempfile.gettempdir(), "SEExceptionSave.json")
+        tmpPath = os.path.join(tempfile.gettempdir(), "SEExceptionSave.scene")
         self.__executeLoad(tmpPath)
 
     def get(self):
