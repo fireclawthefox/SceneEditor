@@ -66,6 +66,35 @@ class ExporterPy:
 
         self.write_scene_element(scene_root, "rootParent")
 
+        if hasattr(scene_root, "get_children") \
+        and len(scene_root.get_children()) > 0:
+            # Create helper functions for scene_root
+            self.content += "\n"
+            self.content += " "*4 + "def show(self):\n"
+            for obj in scene_root.get_children():
+                if obj in self.objects \
+                and not obj.is_stashed() \
+                and obj.get_tag("object_type") == "model":
+                    obj_name = self.get_save_object_name(obj.get_name())
+                    self.content += " "*8 + f"self.{obj_name}.show()\n"
+
+            self.content += "\n"
+            self.content += " "*4 + "def hide(self):\n"
+            for obj in scene_root.get_children():
+                if obj in self.objects \
+                and not obj.is_stashed() \
+                and obj.get_tag("object_type") == "model":
+                    obj_name = self.get_save_object_name(obj.get_name())
+                    self.content += " "*8 + f"self.{obj_name}.hide()\n"
+
+            self.content += "\n"
+            self.content += " "*4 + "def remove_node(self):\n"
+            for obj in scene_root.get_children():
+                if obj in self.objects \
+                and not obj.is_stashed() \
+                and obj.get_tag("object_type") == "model":
+                    obj_name = self.get_save_object_name(obj.get_name())
+                    self.content += " "*8 + f"self.{obj_name}.remove_node()\n"
 
         self.browser = DirectFolderBrowser(
             self.save,
