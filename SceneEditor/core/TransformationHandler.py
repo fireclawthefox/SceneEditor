@@ -20,6 +20,13 @@ class TransformationHandler:
         self.limit_line.setThickness(3)
         self.limit_line_np.stash()
 
+        self.center_line_np = self.scene_root.attachNewNode('center_line_np')
+        self.center_line = LineNodePath(self.center_line_np)
+        self.center_line.lineNode.setName('center_line')
+        self.center_line.setThickness(1)
+        self.center_line.set_color(VBase4(0.8, 0.8, 0.8, 1))
+        self.center_line_np.stash()
+
 
     #
     # LIMITING LINES
@@ -83,6 +90,21 @@ class TransformationHandler:
         self.limiting_y = False
         self.limiting_z = False
 
+    def draw_center_line(self, start_pos, end_pos):
+        self.center_line_np.unstash()
+        self.center_line_np.set_hpr(0,0,0)
+        self.center_line_np.set_bin("gui-popup", 0)
+        self.center_line_np.setDepthTest(False)
+        self.center_line.reset()
+        self.center_line.moveTo(start_pos)
+        self.center_line.drawTo(end_pos)
+        self.center_line.create()
+
+        self.prepare_for_editor(self.center_line)
+
+    def clear_center(self):
+        self.center_line.reset()
+        self.center_line_np.stash()
 
     #
     # MOVING
@@ -203,8 +225,12 @@ class TransformationHandler:
             # get the position as it is seen on screen
             base.cam.node().get_lens().project(camspace_point, screenspace_point)
 
-            x = screenspace_point.x - mpos.x
-            y = screenspace_point.y - mpos.y
+            dr = base.cam.node().get_display_region(0)
+            x = (screenspace_point.x - mpos.x) + dr.dimensions[0]
+            y = (screenspace_point.y - mpos.y) - (1 - dr.dimensions[3])
+
+            #print(f"DR: {(1 - dr.dimensions[3])}")
+
             rad = -math.atan2(y, x)
             deg = rad * (180 / math.pi)
 
@@ -248,9 +274,10 @@ class TransformationHandler:
                 # store the old position
                 old_hpr = obj.get_hpr()
 
+                dr = base.cam.node().get_display_region(0)
                 # rotate mouse around the middle point of all models
-                x = t.middle.x - mpos.x
-                y = t.middle.y - mpos.y
+                x = (t.middle.x - mpos.x) + dr.dimensions[0]
+                y = (t.middle.y - mpos.y) - (1 - dr.dimensions[3])
                 rad = -math.atan2(y, x)
                 deg = rad * (180 / math.pi)
 
@@ -267,6 +294,29 @@ class TransformationHandler:
                     obj.set_r(deg-hpr)
                 elif self.limiting_z:
                     obj.set_h(deg+hpr)
+
+
+
+
+
+                # get the model position in camera space
+                camspace_point = obj.get_pos(base.cam)
+                screenspace_point = Point3()
+                # get the position as it is seen on screen
+                base.cam.node().get_lens().project(camspace_point, screenspace_point)
+
+                x = screenspace_point.x - t.middle.x
+                y = screenspace_point.y - t.middle.y
+                point_a = Point3(x, screenspace_point.z, y)
+                #*base.win.get_size()[0]/2
+
+                x = screenspace_point.x - mpos.x
+                y = screenspace_point.y - mpos.y
+
+                point_b = Point3(x, screenspace_point.z, y)
+                print(point_b)
+
+                self.draw_center_line(point_a, point_b)
 
 
                 # check if the item has actually moved
@@ -327,16 +377,18 @@ class TransformationHandler:
             # get the position as it is seen on screen
             base.cam.node().get_lens().project(camspace_point, screenspace_point)
 
+            dr = base.cam.node().get_display_region(0)
+
             if max_x is None:
-                max_x = screenspace_point.x
-                max_y = screenspace_point.y
-                min_x = screenspace_point.x
-                min_y = screenspace_point.y
+                max_x = screenspace_point.x + dr.dimensions[0]
+                max_y = screenspace_point.y - (1 - dr.dimensions[3])
+                min_x = screenspace_point.x + dr.dimensions[0]
+                min_y = screenspace_point.y - (1 - dr.dimensions[3])
             else:
-                max_x = max(max_x, screenspace_point.x)
-                max_y = max(max_y, screenspace_point.y)
-                min_x = min(min_x, screenspace_point.x)
-                min_y = min(min_y, screenspace_point.y)
+                max_x = max(max_x, screenspace_point.x + dr.dimensions[0])
+                max_y = max(max_y, screenspace_point.y - (1 - dr.dimensions[3]))
+                min_x = min(min_x, screenspace_point.x + dr.dimensions[0])
+                min_y = min(min_y, screenspace_point.y - (1 - dr.dimensions[3]))
 
             object_infos[obj] = [
                 obj.get_scale()
