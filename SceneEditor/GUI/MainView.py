@@ -14,12 +14,11 @@ from DirectGuiExtension.DirectBoxSizer import DirectBoxSizer
 from DirectGuiExtension.DirectAutoSizer import DirectAutoSizer
 from DirectGuiExtension.DirectSplitFrame import DirectSplitFrame
 
-from SceneEditor.GUI.MenuBar import MenuBar
+from SceneEditor.GUI.MenuBar import SEMenuBar
 from SceneEditor.GUI.ToolBar import ToolBar
 from SceneEditor.GUI.panels.PropertiesPanel import PropertiesPanel
 from SceneEditor.GUI.panels.StructurePanel import StructurePanel
 from SceneEditor.GUI.dialogs.ShaderLoaderDialogManager import ShaderLoaderDialogManager
-
 
 class MainView(DirectObject):
     def __init__(self, tooltip, grid, core, parent):
@@ -124,9 +123,9 @@ class MainView(DirectObject):
         #
         # CONTENT SETUP
         #
-        self.menuBar = MenuBar()
-        self.menuBarSizer.setChild(self.menuBar.menuBar)
-        self.menuBarSizer["childUpdateSizeFunc"] = self.menuBar.menuBar.refresh
+        self.menuBar = SEMenuBar()
+        self.menuBarSizer.setChild(self.menuBar)
+        self.menuBarSizer["childUpdateSizeFunc"] = self.menuBar.refresh
 
         self.tool_bar = ToolBar(tooltip, grid)
         self.toolBarSizer.setChild(self.tool_bar.toolBar)
@@ -143,7 +142,7 @@ class MainView(DirectObject):
 
         self.accept("show_load_shader_dialog", self.show_load_shader_dialog)
 
-        self.mainBox.refresh()
+        self.mainSizer.refresh()
 
     def update_3d_display_region(self):
         dr = base.cam.node().get_display_region(0)

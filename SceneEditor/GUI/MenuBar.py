@@ -6,143 +6,89 @@ from DirectGuiExtension.DirectMenuItem import (
     DirectMenuItemSubMenu,
     DirectMenuSeparator)
 from DirectGuiExtension.DirectBoxSizer import DirectBoxSizer
+from panda3d_frame_editor_base.ui.FrameMenuBar import FrameMenuBar, MenuItem
 
-class MenuBar(DirectObject):
+class SEMenuBar(FrameMenuBar):
     def __init__(self):
-        screenWidthPx = base.getSize()[0]
 
-        #
-        # Menubar
-        #
-        self.menuBar = DirectBoxSizer(
-            frameColor=(0.25, 0.25, 0.25, 1),
-            frameSize=(0,screenWidthPx,-12, 12),
-            autoUpdateFrameSize=False,
-            pos=(0, 0, 0),
-            itemMargin=(2,2,2,2),
-            parent=base.pixel2d)
+        self.fileEntries = {
+            "New": "newProject",
+            "sep1": "---",
+            "Open": "loadProject",
+            "Save": "saveProject",
+            "Export >": {
+                "Python": "exportProject_python",
+                "Bam": "exportProject_bam"
+            },
+            "sep2": "---",
+            "Quit": "quit_app"
+        }
 
-        self.export_entry = DirectMenuItemSubMenu("Export >", [
-            DirectMenuItemEntry("Python", base.messenger.send, ["exportProject_python"]),
-            DirectMenuItemEntry("Bam", base.messenger.send, ["exportProject_bam"]),
-        ])
-        self.fileEntries = [
-            DirectMenuItemEntry("New", base.messenger.send, ["newProject"]),
-            DirectMenuSeparator(),
-            DirectMenuItemEntry("Open", base.messenger.send, ["loadProject"]),
-            DirectMenuItemEntry("Save", base.messenger.send, ["saveProject"]),
-            self.export_entry,
-            DirectMenuSeparator(),
-            DirectMenuItemEntry("Quit", base.messenger.send, ["quit_app"]),
-            ]
-        self.file = self.__create_menu_item("File", self.fileEntries)
-
-        viewEntries = [
-            DirectMenuItemEntry("Toggle Grid", base.messenger.send, ["toggleGrid"]),
-            DirectMenuSeparator(),
-            DirectMenuItemEntry("Zoom-in", base.messenger.send, ["zoom-in"]),
-            DirectMenuItemEntry("Zoom-out", base.messenger.send, ["zoom-out"]),
-            DirectMenuItemEntry("reset Zoom", base.messenger.send, ["zoom-reset"]),
-
+        entries = [
+            MenuItem("File", self.fileEntries),
+            MenuItem("View", {
+                "Toggle Grid": "toggleGrid",
+                "sep1": "---",
+                "Zoom In": [base.messenger.send, ["zoom-in", [True]]],
+                "Zoom Out": [base.messenger.send, ["zoom-out", [False]]],
+                "Reset Zoom": "zoom-reset"
+            }),
+            MenuItem("Tools", {
+                "Undo": "undo",
+                "Redo": "redo",
+                "Cycle redos": "cycleRedo",
+                "sep1": "---",
+                "Delete Object": "removeObject",
+                "Copy": "copyElement",
+                "Cut": "cutElement",
+                "Paste": "pasteElement",
+            }),
+            MenuItem("Add", {
+                "Model": "loadModel",
+                "Panda": "loadPanda",
+                "Empty": "addEmpty",
+                "Collision >": {
+                    "Sphere": [base.messenger.send, ["addCollision", ["CollisionSphere", {}]]],
+                    "Box": [base.messenger.send, ["addCollision", ["CollisionBox", {}]]],
+                    "Plane": [base.messenger.send, ["addCollision", ["CollisionPlane", {}]]],
+                    "Capsule": [base.messenger.send, ["addCollision", ["CollisionCapsule", {}]]],
+                    "Line": [base.messenger.send, ["addCollision", ["CollisionLine", {}]]],
+                    "Segment": [base.messenger.send, ["addCollision", ["CollisionSegment", {}]]],
+                    "Ray": [base.messenger.send, ["addCollision", ["CollisionRay", {}]]],
+                    #"Parabola": [base.messenger.send, ["addCollision", ["CollisionParabola", {}]]],
+                    "Inverse Sphere": [base.messenger.send, ["addCollision", ["CollisionInvSphere", {}]]],
+                    #Polygon    # Do we want to support this
+                },
+                "Physics Node": "addPhysicsNode",
+                "Light >": {
+                    "Point Light": [base.messenger.send, ["addLight", ["PointLight", {}]]],
+                    "Spotlight": [base.messenger.send, ["addLight", ["Spotlight", {}]]],
+                    "Directional Light": [base.messenger.send, ["addLight", ["DirectionalLight", {}]]],
+                    "Ambient Light": [base.messenger.send, ["addLight", ["AmbientLight", {}]]],
+                },
+                "Camera >": {
+                    "Perspective": [base.messenger.send, ["addCamera", ["PerspectiveLens", {}]]],
+                    "Orthographic": [base.messenger.send, ["addCamera", ["OrthographicLens", {}]]],
+                },
+                "Shader": "show_load_shader_dialog",
+            })
         ]
-        self.view = self.__create_menu_item("View", viewEntries)
 
-        toolsEntries = [
-            DirectMenuItemEntry("Undo", base.messenger.send, ["undo"]),
-            DirectMenuItemEntry("Redo", base.messenger.send, ["redo"]),
-            DirectMenuItemEntry("Cycle redos", base.messenger.send, ["cycleRedo"]),
-            DirectMenuSeparator(),
-            DirectMenuItemEntry("Delete Object", base.messenger.send, ["removeObject"]),
-            DirectMenuItemEntry("Copy", base.messenger.send, ["copyElement"]),
-            DirectMenuItemEntry("Cut", base.messenger.send, ["cutElement"]),
-            DirectMenuItemEntry("Paste", base.messenger.send, ["pasteElement"]),
-            #DirectMenuSeparator(),
-            #DirectMenuItemEntry("Options", base.messenger.send, ["showSettings"]),
-            #DirectMenuItemEntry("Help", base.messenger.send, ["showHelp"]),
-        ]
-        self.tools = self.__create_menu_item("Tools", toolsEntries)
+        FrameMenuBar.__init__(self, entries)
 
-        addEntries = [
-            DirectMenuItemEntry("Model", base.messenger.send, ["loadModel"]),
-            DirectMenuItemEntry("Panda", base.messenger.send, ["loadPanda"]),
-            DirectMenuItemEntry("Empty", base.messenger.send, ["addEmpty"]),
-            DirectMenuItemSubMenu("Collision >", [
-                DirectMenuItemEntry("Sphere", base.messenger.send, ["addCollision", ["CollisionSphere", {}]]),
-                DirectMenuItemEntry("Box", base.messenger.send, ["addCollision", ["CollisionBox", {}]]),
-                DirectMenuItemEntry("Plane", base.messenger.send, ["addCollision", ["CollisionPlane", {}]]),
-                DirectMenuItemEntry("Capsule", base.messenger.send, ["addCollision", ["CollisionCapsule", {}]]),
-                DirectMenuItemEntry("Line", base.messenger.send, ["addCollision", ["CollisionLine", {}]]),
-                DirectMenuItemEntry("Segment", base.messenger.send, ["addCollision", ["CollisionSegment", {}]]),
-                DirectMenuItemEntry("Ray", base.messenger.send, ["addCollision", ["CollisionRay", {}]]),
-                #DirectMenuItemEntry("Parabola", base.messenger.send, ["addCollision", ["CollisionParabola", {}]]),
-                DirectMenuItemEntry("Inverse Sphere", base.messenger.send, ["addCollision", ["CollisionInvSphere", {}]]),
-                #Polygon    # Do we want to support this
-                ]),
-            DirectMenuItemEntry("Physics Node", base.messenger.send, ["addPhysicsNode"]),
-            DirectMenuItemSubMenu("Light >", [
-                DirectMenuItemEntry("Point Light", base.messenger.send, ["addLight", ["PointLight", {}]]),
-                DirectMenuItemEntry("Spotlight", base.messenger.send, ["addLight", ["Spotlight", {}]]),
-                DirectMenuItemEntry("Directional Light", base.messenger.send, ["addLight", ["DirectionalLight", {}]]),
-                DirectMenuItemEntry("Ambient Light", base.messenger.send, ["addLight", ["AmbientLight", {}]]),
-                ]),
-            DirectMenuItemSubMenu("Camera >", [
-                DirectMenuItemEntry("Perspective", base.messenger.send, ["addCamera", ["PerspectiveLens", {}]]),
-                DirectMenuItemEntry("Orthographic", base.messenger.send, ["addCamera", ["OrthographicLens", {}]]),
-                ]),
-            DirectMenuItemEntry("Shader", base.messenger.send, ["show_load_shader_dialog"]),
-        ]
-        #TODO: THE COLORS DON'T WORK CORRECT YET
-        self.add = self.__create_menu_item("Add", addEntries)
+        #for item in self["items"]:
+        #    item.element.hide()
+        #for item in self["menuItems"]:
+        #    item.hide()
 
-        self.menuBar.addItem(self.file, skipRefresh=True)
-        self.menuBar.addItem(self.view, skipRefresh=True)
-        self.menuBar.addItem(self.tools, skipRefresh=True)
-        self.menuBar.addItem(self.add)
+        #for item in self["items"]:
+        #    print(item.element.isHidden())
 
     def add_export_entry(self, text, tag):
-        self.export_entry.items.append(
-            DirectMenuItemEntry(text, base.messenger.send, ["custom_export", [tag]]))
-        self.fileEntries[4] = self.export_entry
-        self.file["items"] = self.fileEntries
+        self.fileEntries["Export >"].update({
+            text: [base.messenger.send, ["custom_export", [tag]]]
+        })
 
-        color = (
-            (0.25, 0.25, 0.25, 1), # Normal
-            (0.35, 0.35, 1, 1), # Click
-            (0.25, 0.25, 1, 1), # Hover
-            (0.1, 0.1, 0.1, 1)) # Disabled
-
-        self.file["item_text_fg"]=(1,1,1,1)
-        self.file["item_text_scale"]=0.8
-        self.file["item_relief"]=DGG.FLAT
-        self.file["item_pad"]=(0.2, 0.2)
-        self.file["itemFrameColor"]=color
-        self.file["popupMenu_itemMargin"]=(0,0,-.1,-.1)
-        self.file["popupMenu_frameColor"]=color
-
-    def __create_menu_item(self, text, entries):
-        color = (
-            (0.25, 0.25, 0.25, 1), # Normal
-            (0.35, 0.35, 1, 1), # Click
-            (0.25, 0.25, 1, 1), # Hover
-            (0.1, 0.1, 0.1, 1)) # Disabled
-
-        sepColor = (0.7, 0.7, 0.7, 1)
-
-        return DirectMenuItem(
-            text=text,
-            text_fg=(1,1,1,1),
-            text_scale=0.8,
-            items=entries,
-            frameSize=(0,65/21,-7/21,17/21),
-            frameColor=color,
-            scale=21,
-            relief=DGG.FLAT,
-            item_text_fg=(1,1,1,1),
-            item_text_scale=0.8,
-            item_relief=DGG.FLAT,
-            item_pad=(0.2, 0.2),
-            itemFrameColor=color,
-            separatorFrameColor=sepColor,
-            popupMenu_itemMargin=(0,0,-.1,-.1),
-            popupMenu_frameColor=color,
-            highlightColor=color[2])
+        self.entries[0].entry_dict = self.fileEntries
+        self.set_entries(self.entries)
+        #self.update_entry([MenuItem("File", self.fileEntries)])
