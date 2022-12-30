@@ -1,3 +1,4 @@
 panda3d
 DirectFolderBrowser
 DirectGuiExtension
+panda3d-frame-editor-base
