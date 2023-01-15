@@ -76,14 +76,6 @@ class SEMenuBar(FrameMenuBar):
 
         FrameMenuBar.__init__(self, entries)
 
-        #for item in self["items"]:
-        #    item.element.hide()
-        #for item in self["menuItems"]:
-        #    item.hide()
-
-        #for item in self["items"]:
-        #    print(item.element.isHidden())
-
     def add_export_entry(self, text, tag):
         self.fileEntries["Export >"].update({
             text: [base.messenger.send, ["custom_export", [tag]]]
