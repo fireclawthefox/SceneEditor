@@ -255,7 +255,7 @@ class TransformationHandler:
         t.has_rotated = False
         t.start_mouse_pos = Point2(mpos)
         t.last_mouse_pos = mpos
-        t.middle = Point2((min_x + max_x)/2, (min_y + max_y)/2)
+        t.middle = Point2(((min_x + max_x)/base.a2dRight)/2, (min_y + max_y)/2)
 
     def rotate_objects_task(self, t):
         mwn = base.mouseWatcherNode
@@ -263,41 +263,44 @@ class TransformationHandler:
 
             mpos = base.mouseWatcherNode.getMouse()
 
-            for obj in t.object_infos.keys():
+            print(f"MPOS: {mpos}")
+            print(f"MIDDLE: {t.middle}")
 
-                # check if the mouse has moved far enough from it's initial position
-                mouseMove = (t.start_mouse_pos - mpos)
-                if mouseMove.length() < 0.001:
-                    # we don't want the model to move yet
-                    return t.cont
+            # check if the mouse has moved far enough from it's initial position
+            mouseMove = (t.start_mouse_pos - mpos)
+            if mouseMove.length() < 0.001:
+                # we don't want the model to move yet
+                return t.cont
+
+            dr = base.cam.node().get_display_region(0)
+            # rotate mouse around the middle point of all models
+            x = (t.middle.x - mpos.x) + dr.dimensions[0]
+            y = (t.middle.y - mpos.y) - (1 - dr.dimensions[3])
+            rad = -math.atan2(y, x)
+            deg = rad * (180 / math.pi)
+
+            for obj in t.object_infos.keys():
 
                 # store the old position
                 old_hpr = obj.get_hpr()
 
-                dr = base.cam.node().get_display_region(0)
-                # rotate mouse around the middle point of all models
-                x = (t.middle.x - mpos.x) + dr.dimensions[0]
-                y = (t.middle.y - mpos.y) - (1 - dr.dimensions[3])
-                rad = -math.atan2(y, x)
-                deg = rad * (180 / math.pi)
-
                 # subtract the start hpr so we always start at 0 where the mouse is at first
-                deg -= t.object_infos[obj][0]
+                deg_from_object = deg - t.object_infos[obj][0]
                 # get the models start hpr so it won't be reset to a hpr of 0
                 hpr = t.object_infos[obj][1]
 
                 if not (self.limiting_x or self.limiting_y or self.limiting_z):
-                    obj.set_quat(LRotation(obj.parent.get_relative_vector(base.cam, (0,1,0)), deg-hpr))
+                    obj.set_quat(LRotation(obj.parent.get_relative_vector(base.cam, (0,1,0)), deg_from_object-hpr))
                 elif self.limiting_x:
-                    obj.set_p(deg-hpr)
+                    obj.set_p(deg_from_object-hpr)
                 elif self.limiting_y:
-                    obj.set_r(deg-hpr)
+                    obj.set_r(deg_from_object-hpr)
                 elif self.limiting_z:
-                    obj.set_h(deg+hpr)
+                    obj.set_h(deg_from_object+hpr)
 
 
 
-
+                '''
 
                 # get the model position in camera space
                 camspace_point = obj.get_pos(base.cam)
@@ -316,8 +319,18 @@ class TransformationHandler:
                 point_b = Point3(x, screenspace_point.z, y)
                 print(point_b)
 
-                self.draw_center_line(point_a, point_b)
+                print("SCREENSPACE:", screenspace_point)
+                screen_mpos = Point3(mpos.x, mpos.y, 0)
+                base.cam.node().get_lens().project(camspace_point, screen_mpos)
+                print("S_MP:", screen_mpos)
 
+                screen_mmpos = Point3(t.middle.x, t.middle.y, 0)
+                base.cam.node().get_lens().project(camspace_point, screen_mmpos)
+                print("S_MMP:", screen_mmpos)
+
+                self.draw_center_line(screen_mmpos, screen_mpos)# point_a, point_b)
+
+                '''
 
                 # check if the item has actually moved
                 if old_hpr != obj.get_hpr():
@@ -342,6 +355,7 @@ class TransformationHandler:
             base.messenger.send("update_properties")
 
         self.clear_limit()
+        self.clear_center()
 
         taskMgr.remove("rotate_objects_task")
 
@@ -352,6 +366,7 @@ class TransformationHandler:
             obj.set_hpr(t.object_infos[obj][2])
 
         self.clear_limit()
+        self.clear_center()
 
         taskMgr.remove("rotate_objects_task")
 
