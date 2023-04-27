@@ -159,7 +159,7 @@ class ProjectLoader(DirectObject):
         parent_name = info["parent"]
         if parent_name != "scene_model_parent":
             parents = self.core.scene_objects[:]
-            for obj in parents.reverse():
+            for obj in reversed(parents):
                 if obj.get_name() == parent_name:
                     model.reparent_to(obj)
                     break

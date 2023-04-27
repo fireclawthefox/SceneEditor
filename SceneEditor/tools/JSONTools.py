@@ -17,20 +17,23 @@ from SceneEditor.GUI.panels.PropertiesPanel import PropertyHelper
 class JSONTools:
     def getProjectJSON(self, scene_objects, scene_root):
         self.scene_objects = scene_objects
-        jsonElements = {}
-        jsonElements["ProjectVersion"] = "0"
-        jsonElements["Scene"] = {}
+        self.jsonElements = {}
+        self.jsonElements["ProjectVersion"] = "0"
+        self.jsonElements["Scene"] = {}
 
-        self.writtenRoots = []
+        self.writeScene(scene_root)
 
+        return self.jsonElements
+
+    def writeScene(self, root):
         index = 0
-        for child in scene_root.get_children():
+        for child in root.get_children():
             if child in self.scene_objects:
                 if not child.is_stashed():
                     index += 1
-                    jsonElements["Scene"][f"{index}|{child.get_name()}"] = self.__createJSONEntry(child)
-
-        return jsonElements
+                    self.jsonElements["Scene"][f"{index}|{child.get_name()}"] = self.__createJSONEntry(child)
+                if child.getNumChildren() > 0:
+                    self.writeScene(child)
 
     def __createJSONEntry(self, scene_object):
         object_type = scene_object.get_tag("object_type")
