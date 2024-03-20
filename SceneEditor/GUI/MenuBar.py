@@ -5,7 +5,7 @@ from DirectGuiExtension.DirectMenuItem import (
     DirectMenuItemEntry,
     DirectMenuItemSubMenu,
     DirectMenuSeparator)
-from DirectGuiExtension.DirectBoxSizer import DirectBoxSizer
+from DirectGuiExtension.DirectMenuBar import DirectMenuBar
 
 class MenuBar(DirectObject):
     def __init__(self):
@@ -14,7 +14,7 @@ class MenuBar(DirectObject):
         #
         # Menubar
         #
-        self.menuBar = DirectBoxSizer(
+        self.menuBar = DirectMenuBar(
             frameColor=(0.25, 0.25, 0.25, 1),
             frameSize=(0,screenWidthPx,-12, 12),
             autoUpdateFrameSize=False,
@@ -94,10 +94,7 @@ class MenuBar(DirectObject):
         #TODO: THE COLORS DON'T WORK CORRECT YET
         self.add = self.__create_menu_item("Add", addEntries)
 
-        self.menuBar.addItem(self.file, skipRefresh=True)
-        self.menuBar.addItem(self.view, skipRefresh=True)
-        self.menuBar.addItem(self.tools, skipRefresh=True)
-        self.menuBar.addItem(self.add)
+        self.menuBar["menuItems"] = [self.file, self.view, self.tools, self.add]
 
     def add_export_entry(self, text, tag):
         self.export_entry.items.append(
