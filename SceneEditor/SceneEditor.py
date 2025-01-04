@@ -611,6 +611,15 @@ class SceneEditor(DirectObject):
             self.tt,
             self.new)
 
+    def load_file(self, filename):
+        (path, projectname) = os.path.split(filename)
+        ProjectLoader(
+            path,
+            projectname,
+            self.core,
+            newProjectCall=self.new,
+            directLoading=True)
+
     def do_exception_save(self):
         ExporterProject(
             self.lastDirPath,

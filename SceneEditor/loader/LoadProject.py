@@ -19,7 +19,7 @@ from panda3d.core import LVecBase2f, LVecBase3f, LVecBase4f, LPoint2f, LPoint3f,
 from panda3d.core import LVecBase2i
 from panda3d.core import LVecBase2, LVecBase3, LVecBase4, LPoint2, LPoint3, LPoint4
 from panda3d.core import LVector2f
-from panda3d.core import LPlane
+from panda3d.core import LPlane, LPlanef
 
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 
@@ -28,12 +28,16 @@ from SceneEditor.GUI.panels.PropertiesPanel import PropertyHelper
 
 
 class ProjectLoader(DirectObject):
-    def __init__(self, load_path, load_file, core, exceptionLoading=False, tooltip=None, newProjectCall=None):
+    def __init__(self, load_path, load_file, core, exceptionLoading=False, tooltip=None, newProjectCall=None, directLoading=False):
         self.newProjectCall = newProjectCall
         self.hasErrors = False
         self.core = core
         self.objects = []
-        if exceptionLoading:
+        if directLoading:
+            if not self.newProjectCall():
+                return
+            self.__executeLoad(os.path.join(load_path, load_file))
+        elif exceptionLoading:
             self.excLoad()
         else:
             self.browser = DirectFolderBrowser(
