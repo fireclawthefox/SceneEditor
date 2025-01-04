@@ -286,11 +286,7 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
             logging.warning(f"Unsupported collision solid type {solid_type}.")
             return
 
-        if solid_type == "CollisionPlane":
-            # BUG https://github.com/panda3d/panda3d/issues/1248
-            col_np.set_tag("collision_solid_info", str(solid_info).replace(" ", ", ").replace(":,", ":"))
-        else:
-            col_np.set_tag("collision_solid_info", str(solid_info))
+        col_np.set_tag("collision_solid_info", str(solid_info))
         cn.add_solid(col)
 
         # usual scene editor setup
@@ -338,11 +334,7 @@ class Core(TransformationHandler, SelectionHandler, CoreKillRingHandler):
         else:
             logging.warning(f"Unsupported collision solid type {solid_type}.")
             return
-        if solid_type == "CollisionPlane":
-            # BUG https://github.com/panda3d/panda3d/issues/1248
-            obj.set_tag("collision_solid_info", str(solid_info).replace(" ", ", ").replace(":,", ":"))
-        else:
-            obj.set_tag("collision_solid_info", str(solid_info))
+        obj.set_tag("collision_solid_info", str(solid_info))
 
     def add_light(self, light_type, light_info):
         light_model_np = None

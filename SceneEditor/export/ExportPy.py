@@ -14,7 +14,7 @@ from direct.gui.DirectFrame import DirectFrame
 from direct.gui.DirectDialog import YesNoDialog
 from panda3d.core import LVecBase2f, LVecBase3f, LVecBase4f, LPoint2f, LPoint3f, LPoint4f, LVector3f
 from panda3d.core import LVecBase2, LVecBase3, LVecBase4, LPoint2, LPoint3, LPoint4
-from panda3d.core import LPlane
+from panda3d.core import LPlane, LPlanef
 
 from DirectFolderBrowser.DirectFolderBrowser import DirectFolderBrowser
 
@@ -33,6 +33,7 @@ class ExporterPy:
             "LVecBase2f",
             "LVector2f",
             "LPlane",
+            "LPlanef",
             "NodePath",
             "CollisionNode",
             "CollisionSphere",
@@ -135,7 +136,7 @@ class ExporterPy:
                         for key, value in eval(obj.get_tag('collision_solid_info')).items():
                             if key == "plane":
                                 # BUG https://github.com/panda3d/panda3d/issues/1248
-                                valueStr = repr(value).replace(" ", ", ")
+                                valueStr = repr(value)#.replace(" ", ", ")
                                 self.content += " "*12 + f"{valueStr},\n"
                             else:
                                 self.content += " "*12 + f"{value},\n"
@@ -202,7 +203,7 @@ class ExporterPy:
 
                         self.content += "\n"
 
-                self.write_scene_element(obj, obj.get_name())
+                self.write_scene_element(obj, f"self.{obj.get_name()}")
 
     def get_save_object_name(self, name):
         unsave_characters = [
